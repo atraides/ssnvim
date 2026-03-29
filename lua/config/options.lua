@@ -5,7 +5,6 @@ vim.opt.number         = true    -- absolute line number on cursor line
 vim.opt.relativenumber = true    -- relative numbers everywhere else
 vim.opt.signcolumn     = "yes"   -- always show sign column (prevents layout shift)
 vim.opt.cursorline     = true    -- highlight the line the cursor is on
-vim.opt.colorcolumn    = "100"   -- visual ruler at 100 chars
 vim.opt.termguicolors  = true    -- 24-bit RGB colours (required for most colorschemes)
 vim.opt.wrap           = false   -- no line wrapping
 vim.opt.scrolloff      = 8       -- keep 8 lines above/below cursor
