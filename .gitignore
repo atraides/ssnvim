@@ -1,0 +1,9 @@
+# Neovim runtime artifacts
+*.log
+.luarc.json
+*.env
+
+# OS
+.DS_Store
+
+# Do NOT ignore lazy-lock.json — commit it for reproducible installs
