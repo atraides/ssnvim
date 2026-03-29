@@ -1,0 +1,6 @@
+{
+  "auto-dark-mode.nvim": { "branch": "main", "commit": "fc572de46df01b1813ea9cb763b3eeba36c2266a" },
+  "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
+  "lualine.nvim": { "branch": "master", "commit": "47f91c416daef12db467145e16bed5bbfe00add8" },
+  "rose-pine": { "branch": "main", "commit": "cf2a288696b03d0934da713d66c6d71557b5c997" }
+}
