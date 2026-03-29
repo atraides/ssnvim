@@ -220,7 +220,7 @@ The config is built incrementally. Each phase is complete and functional before 
 | 5 — LSP | `plugins/lsp.lua` | 🔲 Not started |
 | 6 — Completion | `plugins/completion.lua` | 🔲 Not started |
 | 7 — Format/Lint | `plugins/formatting.lua`, `plugins/linting.lua` | 🔲 Not started |
-| 8 — Polish | README, checkhealth, startup time, lockfile commit | 🔲 Not started |
+| 8 — Polish | README, checkhealth, startup time, lockfile commit | ✅ Complete |
 
 ---
 
