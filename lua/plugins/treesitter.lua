@@ -12,7 +12,17 @@ return {
     branch = "master",     -- v1.0 main-branch rewrite removed nvim-treesitter.configs; master has the stable API
     build  = ":TSUpdate",  -- recompile grammars after install/update
     event  = { "BufReadPost", "BufNewFile" },
+    dependencies = {
+      -- gh-actions.nvim registers the gh_actions_expressions grammar.
+      -- Must be a dependency (not a separate spec) so it loads before
+      -- this config function runs.
+      "Hdoc1509/gh-actions.nvim",
+    },
     config = function()
+      -- MUST precede nvim-treesitter.configs.setup() so the grammar is
+      -- registered in the parser list before auto-install runs.
+      require("gh-actions.tree-sitter").setup()
+
       require("nvim-treesitter.configs").setup({
 
         -- Parsers to install automatically on first launch.
@@ -30,6 +40,7 @@ return {
           "markdown",
           "markdown_inline",
           "dockerfile",
+          "gh_actions_expressions",  -- injected grammar for ${{ }} expression highlighting
         },
 
         -- Never auto-install parsers for every filetype encountered.

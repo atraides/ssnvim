@@ -32,6 +32,7 @@ return {
         "golangci-lint", -- go multi-linter
         "shellcheck",    -- shell linting
         "yamllint",      -- yaml linting
+        "actionlint",    -- github actions linting
       }
       registry.refresh(function()
         for _, name in ipairs(tools) do
@@ -181,6 +182,17 @@ return {
         },
       })
 
+      -- ── gh_actions_ls — GitHub Actions expression-aware completions ─────────
+      -- Default filetypes = { 'yaml' } — overridden to yaml.github-actions so
+      -- the server only attaches to workflow files, not all YAML buffers.
+      -- Do NOT set init_options here — the nvim-lspconfig default already has
+      -- init_options = {} which the server requires; vim.lsp.config() merges, not
+      -- replaces, so the default init_options stays in place automatically.
+      -- root_dir scopes to .github/workflows/ and does not need overriding.
+      vim.lsp.config("gh_actions_ls", {
+        filetypes = { "yaml.github-actions" },
+      })
+
       -- ── lua_ls — Lua intelligence for Neovim config ───────────────────────
       -- Neovim runtime added to workspace.library so vim.* resolves without errors.
       -- checkThirdParty = false suppresses the "configure this project?" prompt.
@@ -212,8 +224,9 @@ return {
           "gopls",     -- go
           "bashls",    -- bash/sh/zsh (mason pkg: bash-language-server)
           "yamlls",    -- yaml (mason pkg: yaml-language-server)
-          "helm_ls",   -- helm (mason pkg: helm-ls)
-          "lua_ls",    -- lua (mason pkg: lua-language-server)
+          "helm_ls",      -- helm (mason pkg: helm-ls)
+          "lua_ls",       -- lua (mason pkg: lua-language-server)
+          "gh_actions_ls", -- github actions (mason pkg: gh-actions-language-server)
         },
       })
     end,

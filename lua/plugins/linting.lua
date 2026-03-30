@@ -25,6 +25,11 @@ return {
         bash = { "shellcheck" },
         zsh  = { "shellcheck" },
         yaml = { "yamllint" },
+        -- nvim-lint matches the suffix component of compound filetypes.
+        -- "github-actions" fires for yaml.github-actions buffers only.
+        -- "yaml" key also fires for those buffers (yamllint checks YAML syntax;
+        -- actionlint checks Actions semantics) — both running is intentional.
+        ["github-actions"] = { "actionlint" },
       }
 
       -- ── Lint trigger ─────────────────────────────────────────────────

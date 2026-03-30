@@ -1,8 +1,8 @@
 # ssnvim — Product Requirements Document
 
-> **Version:** 1.0
-> **Date:** 2026-03-29
-> **Status:** Approved — ready for implementation
+> **Version:** 1.1
+> **Date:** 2026-03-30
+> **Status:** Approved — Phase 9 scope additions approved
 
 ---
 
@@ -14,7 +14,7 @@ The configuration prioritizes a lean plugin surface area using modern, high-perf
 
 The MVP delivers a fully functional development environment covering all languages in the user's stack, with automated LSP server installation, format-on-save, async linting, GitHub Copilot completion, and Rosé Pine theming that automatically tracks macOS dark/light mode. It is designed to be portable: a single `git clone` + `nvim` invocation on any machine bootstraps the entire environment.
 
-**MVP Goal:** A working, minimal Neovim configuration that covers Python, Go, bash, YAML/Kubernetes, Helm, and ArgoCD editing with LSP, completion, formatting, linting, and Git integration — built incrementally so every piece is understood before the next is added.
+**MVP Goal:** A working, minimal Neovim configuration that covers Python, Go, bash, YAML/Kubernetes, Helm, ArgoCD, and GitHub Actions editing with LSP, completion, formatting, linting, and Git integration — built incrementally so every piece is understood before the next is added.
 
 ---
 
@@ -88,6 +88,10 @@ The MVP delivers a fully functional development environment covering all languag
 | ✅ nvim-lint async linting | In scope |
 | ✅ Python venv auto-detection (pyenv, poetry, uv) | In scope |
 | ✅ README with install instructions and keybinding reference | In scope |
+| ✅ GitHub Actions filetype detection (`yaml.github-actions` for `.github/workflows/*.yml`) | In scope |
+| ✅ LSP: gh-actions-language-server (GitHub Actions workflows) | In scope |
+| ✅ Linting: actionlint async linting for GitHub Actions workflows | In scope |
+| ✅ gh-actions.nvim: treesitter-based `${{ }}` expression syntax highlighting | In scope |
 
 ### Out of Scope (Future Phases)
 
@@ -130,6 +134,11 @@ The MVP delivers a fully functional development environment covering all languag
 > As a Helm chart maintainer working with monorepos, I want correct syntax highlighting and LSP support for Helm templates, so that Go template syntax and YAML are both handled correctly.
 
 - **Acceptance:** Files in `templates/` directories are detected as `ft=helm`; `helm-ls` attaches; `yaml-language-server` does not conflict.
+
+### US-9: GitHub Actions workflow authoring
+> As a developer who maintains CI/CD pipelines using GitHub Actions, I want completions, diagnostics, and syntax highlighting for workflow files, so that I catch expression errors and invalid workflow keys without leaving the editor.
+
+- **Acceptance:** Files in `.github/workflows/` are detected as `yaml.github-actions`; `gh_actions_ls` attaches and provides completions for `on:`, `jobs:`, `steps:`, `uses:`, and `${{ }}` expressions; `actionlint` reports diagnostics on save; `yamlls` does not attach to workflow files; `${{ secrets.FOO }}` expressions are correctly highlighted by the treesitter `gh_actions_expressions` grammar.
 
 ### US-5: Git workflow
 > As a developer who relies on lazygit, I want to open lazygit as a floating window from within Neovim with a single keybinding, so that I can review, stage, and commit without switching applications.
@@ -275,12 +284,21 @@ Each language server is configured with explicit settings, not defaults:
 
 **YAML (yamlls + SchemaStore):**
 - `schemaStore.enable = false` (use SchemaStore.nvim catalog instead)
-- `schemas = require("schemastore").yaml.schemas()` — auto-applies schemas for Kubernetes, Helm values, ArgoCD, GitHub Actions, Docker Compose, etc.
-- Disabled for `helm` filetype files
+- `schemas = require("schemastore").yaml.schemas()` — auto-applies schemas for Kubernetes, Helm values, ArgoCD, Docker Compose, etc.
+- Filetypes restricted to `{ "yaml", "yaml.docker-compose" }` — explicitly excludes `helm` and `yaml.github-actions`
 
 **Helm (helm-ls):**
 - Only attaches to `ft=helm` files
 - `yamlls` explicitly excluded from Helm buffers
+
+**GitHub Actions (gh_actions_ls):**
+- Mason package: `gh-actions-language-server` (npm `@actions/languageserver` — official GitHub/actions org)
+- lspconfig server name: `gh_actions_ls`
+- Filetype overridden to `{ "yaml.github-actions" }` — lspconfig default uses plain `yaml` with `root_dir` scoping, but we use the compound filetype for clean yamlls separation (mirrors the Helm pattern)
+- `init_options = {}` required (hard requirement per lspconfig source)
+- Custom `actions/readFile` handler included in lspconfig defaults — no override needed
+- Provides: completions for `on:`, `jobs:`, `steps:`, `uses:`, `with:` keys; hover docs; `${{ }}` expression context awareness; semantic tokens
+- Filetype detection autocmd in `autocmds.lua`: `.github/workflows/*.yml` and `.github/workflows/*.yaml` → `yaml.github-actions`
 
 ### 7.3 Completion Stack
 
@@ -318,6 +336,12 @@ Async linting triggered on `BufWritePost` and `BufReadPost`:
 | `go` | `golangci-lint` |
 | `bash`, `sh` | `shellcheck` |
 | `yaml` | `yamllint` |
+| `yaml.github-actions` | `yamllint`, `actionlint` |
+
+**actionlint notes:**
+- Mason package: `actionlint`; built-in nvim-lint adapter
+- Uses `-stdin-filename` flag — actionlint itself validates the file path and will not emit false diagnostics on non-workflow YAML
+- Registered under `yaml.github-actions` only (not `yaml`) to avoid spawning the process on every YAML save across all projects
 
 ---
 
@@ -354,8 +378,16 @@ Async linting triggered on `BufWritePost` and `BufReadPost`:
 | `fang2hou/blink-copilot` | latest | Copilot → blink.cmp bridge |
 | `stevearc/conform.nvim` | latest | Formatter runner |
 | `mfussenegger/nvim-lint` | latest | Async linter runner |
+| `Hdoc1509/gh-actions.nvim` | latest | GitHub Actions treesitter expression highlighting |
 
-**Total plugin count: 19**
+**Total plugin count: 20**
+
+**gh-actions.nvim notes:**
+- Provides treesitter-based syntax highlighting for `${{ }}` expression syntax in GitHub Actions workflows
+- Requires a custom `gh_actions_expressions` treesitter parser (not in the standard nvim-treesitter catalog)
+- Setup requires calling `require("gh-actions.tree-sitter").setup()` before parser installation to register the custom parser source
+- Does not register its own filetype — relies on the `yaml.github-actions` filetype set by our `autocmds.lua`
+- Depends on nvim-treesitter (already present); adds no other plugin dependencies
 
 ### Language Servers (installed by Mason)
 
@@ -369,9 +401,11 @@ Async linting triggered on `BufWritePost` and `BufReadPost`:
 | `bash-language-server` | Bash/Zsh |
 | `shellcheck` | Shell linting |
 | `shfmt` | Shell formatting |
-| `yaml-language-server` | YAML / Kubernetes / Helm values |
+| `yaml-language-server` | YAML / Kubernetes / Helm values (not Helm templates, not GitHub Actions) |
 | `yamllint` | YAML linting |
 | `helm-ls` | Helm templates |
+| `gh-actions-language-server` | GitHub Actions workflows (lspconfig: `gh_actions_ls`) |
+| `actionlint` | GitHub Actions linting |
 | `lua-ls` | Lua (Neovim config) |
 | `stylua` | Lua formatting |
 
@@ -428,6 +462,9 @@ The MVP is complete when:
 ✅ Format-on-save runs for Python, Go, bash, and Lua files
 ✅ `<leader>` + pause shows which-key popup with all registered bindings
 ✅ `README.md` documents installation and all non-obvious keybindings
+✅ Files in `.github/workflows/` are detected as `yaml.github-actions`; `gh_actions_ls` attaches and `yamlls` does not
+✅ `actionlint` reports diagnostics on save for GitHub Actions workflow files
+✅ `${{ secrets.FOO }}` expressions are highlighted by the `gh_actions_expressions` treesitter grammar
 
 ### Quality Indicators
 
@@ -491,22 +528,27 @@ The MVP is complete when:
 
 ✅ nvim-treesitter with parsers: `python`, `go`, `gomod`, `bash`, `yaml`, `helm`, `json`, `lua`, `markdown`, `dockerfile`
 ✅ Verify Helm template files highlight correctly with both Go template and YAML
+✅ `gh-actions.nvim` installed; `require("gh-actions.tree-sitter").setup()` called before parser install to register custom parser source
+✅ `gh_actions_expressions` custom treesitter parser installed via `nvim-treesitter`
 
-**Validation:** Open a Helm template — `{{ .Values.image.tag }}` highlights as a Go template expression, surrounding YAML highlights as YAML.
+**Validation:** Open a Helm template — `{{ .Values.image.tag }}` highlights as a Go template expression, surrounding YAML highlights as YAML. Open a GitHub Actions workflow — `${{ secrets.TOKEN }}` is highlighted with expression-level granularity.
 
 ---
 
 ### Phase 5 — LSP
 **Goal:** Full code intelligence for all languages.
 
-✅ mason.nvim bootstrap and auto-install of all 13 tools
-✅ nvim-lspconfig with server configs for: pyright, ruff, gopls, bash-language-server, yamlls, helm-ls, lua-ls
+✅ mason.nvim bootstrap and auto-install of all 15 tools
+✅ nvim-lspconfig with server configs for: pyright, ruff, gopls, bash-language-server, yamlls, helm-ls, lua-ls, gh_actions_ls
 ✅ SchemaStore.nvim integrated with yamlls
-✅ yamlls explicitly disabled for `ft=helm` buffers
+✅ yamlls explicitly disabled for `ft=helm` and `yaml.github-actions` buffers
+✅ `gh_actions_ls` configured with `filetypes = { "yaml.github-actions" }` (override from default `yaml`)
+✅ GitHub Actions filetype detection in `autocmds.lua`: `.github/workflows/*.yml` → `yaml.github-actions`
+✅ `actionlint` added to Mason non-LSP tools list alongside shellcheck, yamllint, etc.
 ✅ Python venv auto-detection for pyenv, poetry, uv
 ✅ LSP keymaps: go-to-definition, hover, references, rename, code action, diagnostics
 
-**Validation:** Open a FastAPI project — pyright shows types; open a K8s manifest — completions include all API fields; open a Helm template — helm-ls attaches, yamlls does not.
+**Validation:** Open a FastAPI project — pyright shows types; open a K8s manifest — completions include all API fields; open a Helm template — helm-ls attaches, yamlls does not; open `.github/workflows/ci.yml` — gh_actions_ls attaches, yamlls does not, actionlint diagnostics appear on save.
 
 ---
 
@@ -526,10 +568,11 @@ The MVP is complete when:
 **Goal:** Automatic code quality enforcement.
 
 ✅ conform.nvim format-on-save for: Python (ruff_format), Go (goimports), bash (shfmt), Lua (stylua)
-✅ nvim-lint async linting for: Python (ruff), Go (golangci-lint), bash (shellcheck), YAML (yamllint)
+✅ nvim-lint async linting for: Python (ruff), Go (golangci-lint), bash (shellcheck), YAML (yamllint), GitHub Actions (actionlint)
+✅ `linters_by_ft` includes `["yaml.github-actions"] = { "yamllint", "actionlint" }`
 ✅ `<leader>cf` keymap for manual format trigger
 
-**Validation:** Save a Python file with `import os` unused — ruff removes it; save a Go file — goimports runs; YAML with wrong indentation — yamllint marks it.
+**Validation:** Save a Python file with `import os` unused — ruff removes it; save a Go file — goimports runs; YAML with wrong indentation — yamllint marks it; save a workflow with an invalid expression — actionlint reports the error.
 
 ---
 
@@ -543,6 +586,19 @@ The MVP is complete when:
 ✅ Startup time verified < 100ms
 
 **Validation:** Fresh clone on a second machine bootstraps fully without intervention.
+
+---
+
+### Phase 9 — GitHub Actions Support
+**Goal:** Full GitHub Actions workflow editing: filetype detection, LSP, expression highlighting, and linting.
+
+🔲 `lua/config/autocmds.lua` — add `yaml.github-actions` filetype pattern for `.github/workflows/*.{yml,yaml}` alongside existing Helm patterns
+🔲 `lua/plugins/treesitter.lua` — call `require("gh-actions.tree-sitter").setup()` before parser installation; add `gh_actions_expressions` to `ensure_installed`; add `Hdoc1509/gh-actions.nvim` plugin spec
+🔲 `lua/plugins/lsp.lua` — add `gh_actions_ls` to `ensure_installed`; add `actionlint` to the Mason non-LSP tools list; add `vim.lsp.config("gh_actions_ls", { filetypes = { "yaml.github-actions" } })`; update `yamlls` filetypes to exclude `yaml.github-actions`
+🔲 `lua/plugins/linting.lua` — add `["yaml.github-actions"] = { "yamllint", "actionlint" }` to `linters_by_ft`
+🔲 `lazy-lock.json` — commit after `:Lazy sync`
+
+**Validation:** Open `.github/workflows/ci.yml` — `yaml.github-actions` filetype set; `gh_actions_ls` attaches (`:LspInfo`); `yamlls` does not; `${{ secrets.TOKEN }}` highlighted; save with invalid expression — actionlint shows diagnostic.
 
 ---
 
@@ -578,6 +634,8 @@ The MVP is complete when:
 | **snacks.nvim breaking changes** — Folke's active development means APIs shift | Medium | Medium | Commit `lazy-lock.json`; update intentionally, not automatically; read changelog before `<leader>lu` (lazy update) |
 | **Python venv not detected** — pyright picks up wrong Python or none, making completions useless | Medium | High | Explicit `pythonPath` logic covering pyenv, poetry, and uv conventions; document manual override with `.pyrightconfig.json` |
 | **K8s context lualine component slow** — `io.popen("kubectl ...")` blocks on every statusline redraw | Medium | Medium | Cache the result; invalidate only on `BufEnter`/`FocusGained`; use `vim.fn.system()` async variant or read `~/.kube/config` directly via Lua |
+| **GitHub Actions / yamlls conflict** — `yamlls` attaches to `.github/workflows/*.yml` files if `yaml.github-actions` filetype detection is missing or delayed | Medium | Medium | `vim.filetype.add()` pattern in `autocmds.lua` runs before any LSP attach; `yamlls` filetypes list explicitly omits `yaml.github-actions`; same proven pattern as Helm/yaml separation |
+| **gh_actions_expressions parser not installed** — `gh-actions.nvim` silently does nothing if the custom treesitter parser is missing | Low | Low | `require("gh-actions.tree-sitter").setup()` must be called before `nvim-treesitter` installs parsers; document this ordering requirement in `treesitter.lua` comments |
 
 ---
 
@@ -593,6 +651,9 @@ The MVP is complete when:
 - [SchemaStore catalog](https://www.schemastore.org/json/)
 - [kickstart.nvim reference](https://github.com/nvim-lua/kickstart.nvim)
 - [auto-dark-mode.nvim](https://github.com/f-person/auto-dark-mode.nvim)
+- [gh-actions.nvim](https://github.com/Hdoc1509/gh-actions.nvim)
+- [gh-actions-language-server Mason package](https://github.com/mason-org/mason-registry/blob/main/packages/gh-actions-language-server/package.yaml)
+- [GitHub Actions language server (official)](https://github.com/actions/languageservices/tree/main)
 
 ### Repository Structure (final)
 
@@ -631,4 +692,5 @@ Phase 5: LSP           → mason + lspconfig + SchemaStore + all servers
 Phase 6: Completion    → blink.cmp + copilot
 Phase 7: Format/Lint   → conform + nvim-lint
 Phase 8: Polish        → docs, checkhealth, startup time, lockfile
+Phase 9: GitHub Actions → gh_actions_ls, actionlint, gh-actions.nvim, yaml.github-actions filetype
 ```

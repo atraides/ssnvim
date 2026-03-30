@@ -13,6 +13,19 @@ vim.filetype.add({
   },
 })
 
+-- ── GitHub Actions filetype detection ────────────────────────────────────
+-- Uses vim.filetype.add() — same pattern as Helm above.
+-- Runs inside Neovim's filetype pipeline, before BufRead, so LSP and
+-- treesitter see the correct ft on first attach.
+-- yaml.github-actions is a compound filetype: nvim-lint's yaml key still fires
+-- (yamllint), and the github-actions key adds actionlint scoped to workflow files.
+vim.filetype.add({
+  pattern = {
+    [".*/.github/workflows/.*%.yml"]  = "yaml.github-actions",
+    [".*/.github/workflows/.*%.yaml"] = "yaml.github-actions",
+  },
+})
+
 -- ── Highlight on yank ─────────────────────────────────────────────────────
 local yank_group = vim.api.nvim_create_augroup("ssnvim_yank", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
