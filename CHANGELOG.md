@@ -1,3 +1,9 @@
+## v0.2.0 (2026-03-31)
+
+### Feat
+
+- add commit skill for conventional commit workflow
+
 ## v0.1.1 (2026-03-31)
 
 ### Fix
