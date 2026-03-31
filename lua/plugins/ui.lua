@@ -49,7 +49,7 @@ return {
 					vim.cmd("colorscheme tokyonight-night")
 				end,
 				set_light_mode = function()
-					vim.cmd("colorscheme tokyonight-day")
+					vim.cmd("colorscheme ayu-light")
 				end,
 			})
 		end,
