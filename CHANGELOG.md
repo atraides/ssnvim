@@ -1,3 +1,9 @@
+## v0.1.1 (2026-03-31)
+
+### Fix
+
+- Fix sync issue with autocomplete on github workflow files
+
 ## v0.1.0 (2026-03-31)
 
 ### Feat
