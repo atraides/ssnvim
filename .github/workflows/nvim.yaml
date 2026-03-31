@@ -101,7 +101,7 @@ jobs:
         if: steps.detect_tag.outputs.tag_version != ''
         run: |
           mkdir -p dist/
-          zip -r "dist/SSNvim-${{ steps.detect_tag.outputs.tag_version }}.zip" ./init.lue lua/* ./lazy-lock.json
+          zip -r "dist/SSNvim-${{ steps.detect_tag.outputs.tag_version }}.zip" ./init.lua lua/* ./lazy-lock.json
         shell: bash
 
       - name: Create GitHub Release
@@ -117,6 +117,6 @@ jobs:
           draft: false
           prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
           files:
-            dist/SSNvin-${{ steps.detect_tag.outputs.tag_version }}.zip
+            dist/SSNvim-${{ steps.detect_tag.outputs.tag_version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
