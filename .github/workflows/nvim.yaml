@@ -16,7 +16,7 @@ on:
 jobs:
   release:
     name: "Release with Commitizen"
-    runs-on: [ubuntu-slim]
+    runs-on: [ubuntu-24.04]
     if: >-
       github.event_name == 'push' &&
       (
