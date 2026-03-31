@@ -189,8 +189,17 @@ return {
       -- init_options = {} which the server requires; vim.lsp.config() merges, not
       -- replaces, so the default init_options stays in place automatically.
       -- root_dir scopes to .github/workflows/ and does not need overriding.
+      --
+      -- flags.allow_incremental_sync = false: gh_actions_ls occasionally sends
+      -- completion textEdit items whose line positions exceed the buffer's actual
+      -- line count. Neovim's incremental diff in vim/lsp/sync.lua then tries to
+      -- index a non-existent line and crashes ("attempt to get length of local
+      -- 'prev_line' (a nil value)"). Forcing full-document sync bypasses that
+      -- code path entirely. Workflow files are short (<500 lines) so the overhead
+      -- of sending the full document on every change is negligible.
       vim.lsp.config("gh_actions_ls", {
         filetypes = { "yaml.github-actions" },
+        flags     = { allow_incremental_sync = false },
       })
 
       -- ── lua_ls — Lua intelligence for Neovim config ───────────────────────
