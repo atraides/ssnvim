@@ -1,0 +1,8 @@
+[tool.commitizen]
+version_provider = "commitizen"
+version = "0.0.1"  # Required when using this provider
+annotated_tag = true
+gpg_sign = false
+update_changelog_on_bump = true
+tag_format = "v$major.$minor.$patch$prerelease"
+use_shortcuts = true
