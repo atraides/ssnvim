@@ -7,32 +7,14 @@ return {
 	-- before any other plugin can render with the wrong colours.
 	-- auto-dark-mode.nvim handles variant switching (moon↔dawn) at runtime.
 	{
-		"rose-pine/neovim",
-		name = "rose-pine", -- alias required; repo slug "neovim" collides with Neovim runtime
-		lazy = false,
-		priority = 1000,
-		opts = {}, -- use rose-pine defaults; no palette overrides for MVP
-		config = function(_, opts)
-			require("rose-pine").setup(opts)
-			vim.cmd("colorscheme rose-pine") -- initial load; auto-dark-mode overrides on first poll
-		end,
-	},
-	{
-		"folke/tokyonight.nvim",
-		lazy = false,
-		priority = 1000,
-		opts = {},
-	},
-	{
-		"Shatur/neovim-ayu",
+		"atraides/neovim-ayu",
 		lazy = false,
 		priority = 1000,
 		opts = {
-			mirage = true,
+			mirage = false,
 		},
 		config = function(_, opts)
 			require("ayu").setup(opts)
-			vim.cmd("colorscheme rose-pine") -- initial load; auto-dark-mode overrides on first poll
 		end,
 	},
 
@@ -46,7 +28,7 @@ return {
 			require("auto-dark-mode").setup({
 				update_interval = 1000, -- poll every 1 s
 				set_dark_mode = function()
-					vim.cmd("colorscheme tokyonight-night")
+					vim.cmd("colorscheme ayu-dark")
 				end,
 				set_light_mode = function()
 					vim.cmd("colorscheme ayu-light")
@@ -63,7 +45,7 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		lazy = false,
 		config = function()
-			local colors = require("tokyonight.colors").setup()
+			local colors = require("ayu.colors")
 			local conditions = {
 				buffer_not_empty = function()
 					return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
@@ -84,7 +66,7 @@ return {
 					-- Disable sections and component separators
 					component_separators = "",
 					section_separators = "",
-					theme = "tokyonight-night",
+					theme = "ayu",
 				},
 				sections = {
 					-- these are to remove the defaults
@@ -125,14 +107,14 @@ return {
 				color = function()
 					local mode_color = {
 						n = colors.blue,
-						i = colors.green1,
-						v = colors.purple,
+						i = colors.green,
+						v = colors.magenta,
 						[" "] = colors.blue,
-						V = colors.purple,
+						V = colors.magenta,
 						c = colors.warning,
 						no = colors.warning,
-						s = colors.orange,
-						S = colors.orange,
+						s = colors.opeator,
+						S = colors.operator,
 						ic = colors.yellow,
 						R = colors.green,
 						Rv = colors.green,
@@ -152,7 +134,7 @@ return {
 			ins_left({
 				"branch",
 				icon = "",
-				color = { fg = colors.purple, gui = "bold" },
+				color = { fg = colors.magenta },
 			})
 
 			ins_left({
@@ -175,9 +157,9 @@ return {
 				-- Is it me or the symbol for modified us really weird
 				symbols = { added = " ", modified = " ", removed = " " },
 				diff_color = {
-					added = { fg = colors.green },
-					modified = { fg = colors.yellow },
-					removed = { fg = colors.red },
+					added = { fg = colors.vcs_added },
+					modified = { fg = colors.vcs_modified },
+					removed = { fg = colors.vcs_removed },
 				},
 				cond = conditions.hide_in_width,
 			})
@@ -189,7 +171,7 @@ return {
 				diagnostics_color = {
 					error = { fg = colors.error },
 					warn = { fg = colors.warning },
-					info = { fg = colors.info },
+					info = { fg = colors.cyan },
 				},
 			})
 
@@ -207,7 +189,7 @@ return {
 				ignore_lsp = { "stylua" },
 				-- Display the LSP name
 				show_name = true,
-				color = { fg = colors.dark3, gui = "bold" },
+				color = { fg = colors.black, gui = "bold" },
 			})
 
 			ins_right({ "location" })
@@ -262,7 +244,10 @@ return {
 	},
 	{
 		"folke/todo-comments.nvim",
+		lazy = false,
 		dependencies = { "nvim-lua/plenary.nvim" },
-		opts = {},
+		config = function()
+			require("todo-comments").setup()
+		end,
 	},
 }
