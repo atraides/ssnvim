@@ -1,3 +1,9 @@
+## v0.2.2 (2026-04-02)
+
+### Fix
+
+- Fix incorrect todo-comments inclusion
+
 ## v0.2.1 (2026-04-02)
 
 ### Fix
