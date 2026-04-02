@@ -1,3 +1,9 @@
+## v0.2.1 (2026-04-02)
+
+### Fix
+
+- Add todo-comments plugin
+
 ## v0.2.0 (2026-03-31)
 
 ### Feat
