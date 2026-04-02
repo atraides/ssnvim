@@ -72,7 +72,6 @@ jobs:
           TAG_CREATED="$(git tag --points-at HEAD | head -n1 || true)"
           if [ -n "$TAG_CREATED" ]; then
             echo "tag=$TAG_CREATED" >> "$GITHUB_OUTPUT"
-            echo "tag_version=${TAG_CREATED#v}" >> "$GITHUB_OUTPUT"
             echo "Detected release tag at HEAD: $TAG_CREATED"
           else
             echo "No tag at HEAD; skipping release creation."
@@ -98,16 +97,16 @@ jobs:
           echo "notes_path=RELEASE_NOTES.md" >> "$GITHUB_OUTPUT"
 
       - name: Build release archive
-        if: steps.detect_tag.outputs.tag_version != ''
+        if: steps.detect_tag.outputs.tag != ''
         run: |
           mkdir -p dist/
-          zip -r "dist/SSNvim-${{ steps.detect_tag.outputs.tag_version }}.zip" ./init.lua lua/* ./lazy-lock.json
+          zip -r "dist/SSNvim-${{ steps.detect_tag.outputs.tag }}.zip" ./init.lua lua/* ./lazy-lock.json
         shell: bash
 
       - name: Create GitHub Release
         id: git_release
         if: >-
-          steps.detect_tag.outputs.tag_version != '' &&
+          steps.detect_tag.outputs.tag != '' &&
           steps.detect_tag.outputs.tag != ''
         uses: softprops/action-gh-release@v2
         with:
@@ -117,6 +116,6 @@ jobs:
           draft: false
           prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
           files:
-            dist/SSNvim-${{ steps.detect_tag.outputs.tag_version }}.zip
+            dist/SSNvim-${{ steps.detect_tag.outputs.tag }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
