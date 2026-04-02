@@ -1,3 +1,9 @@
+## v0.2.3 (2026-04-02)
+
+### Fix
+
+- Minor ui tweak and new color palette
+
 ## v0.2.2 (2026-04-02)
 
 ### Fix

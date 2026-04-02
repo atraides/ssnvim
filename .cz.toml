@@ -1,6 +1,6 @@
 [tool.commitizen]
 version_provider = "commitizen"
-version = "0.2.2"  # Required when using this provider
+version = "0.2.3"  # Required when using this provider
 annotated_tag = true
 gpg_sign = false
 update_changelog_on_bump = true
