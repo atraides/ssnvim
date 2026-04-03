@@ -1,0 +1,20 @@
+{
+  "plugins": {
+    "auto-dark-mode.nvim": {
+      "rev": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df",
+      "src": "https://github.com/f-person/auto-dark-mode.nvim"
+    },
+    "neovim-ayu": {
+      "rev": "bb3cb7e5c2e85deecd34cf9bc9d8bf688c39589d",
+      "src": "https://github.com/atraides/neovim-ayu"
+    },
+    "nvim-web-devicons": {
+      "rev": "d7462543c9e366c0d196c7f67a945eaaf5d99414",
+      "src": "https://github.com/nvim-tree/nvim-web-devicons"
+    },
+    "witch-line": {
+      "rev": "929a5e9f7ff05bf412507a79c285955ad9e54c3f",
+      "src": "https://github.com/sontungexpt/witch-line"
+    }
+  }
+}
