@@ -1,3 +1,3 @@
 -- ── Load plugins ───────────────────────────────────────────────────────────
-require("plugins.10-ui")
+require("plugins.ui")
 

@@ -4,6 +4,10 @@
       "rev": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df",
       "src": "https://github.com/f-person/auto-dark-mode.nvim"
     },
+    "lualine.nvim": {
+      "rev": "74114f0df664f14d7c228945693ba68a3b70a794",
+      "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
     "neovim-ayu": {
       "rev": "bb3cb7e5c2e85deecd34cf9bc9d8bf688c39589d",
       "src": "https://github.com/atraides/neovim-ayu"
