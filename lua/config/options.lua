@@ -50,7 +50,6 @@ vim.opt.listchars = {
   trail = "·",   	-- trailing space
   nbsp  = "␣",   	-- non-breaking space
   eol = "󰌑",     	-- end-of-line
-  multispace = "|   ",	-- multispace
 }
 
 -- ── Completion ────────────────────────────────────────────────────────────
