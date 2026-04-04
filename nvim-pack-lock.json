@@ -15,10 +15,6 @@
     "nvim-web-devicons": {
       "rev": "d7462543c9e366c0d196c7f67a945eaaf5d99414",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
-    },
-    "witch-line": {
-      "rev": "929a5e9f7ff05bf412507a79c285955ad9e54c3f",
-      "src": "https://github.com/sontungexpt/witch-line"
     }
   }
 }

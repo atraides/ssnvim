@@ -1,5 +1,10 @@
 -- lua/config/options.lua — all vim.opt.* editor settings
 
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+
 -- ── UI ────────────────────────────────────────────────────────────────────
 vim.opt.number         = true    -- absolute line number on cursor line
 vim.opt.relativenumber = true    -- relative numbers everywhere else
@@ -58,7 +63,3 @@ vim.opt.completeopt = { "menuone", "noselect" }  -- blink.cmp compatible
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldenable = false
-
--- ── Statusline comes at the bottom of each window ─────────────────────────
--- https://davelage.com/posts/neovim-laststatus-3/
-vim.opt.laststatus = 3
