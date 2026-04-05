@@ -21,6 +21,8 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 -- ── Buffer navigation ─────────────────────────────────────────────────────
 vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
 vim.keymap.set("n", "]b", "<cmd>bnext<cr>",     { desc = "Next buffer" })
+vim.keymap.set("n", "<leader>bp", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<leader>bn", "<cmd>bnext<cr>",     { desc = "Next buffer" })
 
 -- ── Scrolling — keep cursor centred ──────────────────────────────────────
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down (centred)" })

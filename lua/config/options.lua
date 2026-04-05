@@ -54,11 +54,3 @@ vim.opt.listchars = {
 
 -- ── Completion ────────────────────────────────────────────────────────────
 vim.opt.completeopt = { "menuone", "noselect" }  -- blink.cmp compatible
-
--- ── Folds ─────────────────────────────────────────────────────────────────
--- treesitter-expression folding via Neovim 0.10+ native fold expr.
--- v:lua.vim.treesitter.foldexpr() returns "0" gracefully for buffers with
--- no treesitter parser (e.g. dashboard), so no errors occur on those buffers.
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
-vim.opt.foldenable = false

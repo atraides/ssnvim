@@ -48,3 +48,5 @@ autocmd("VimResized", {
   desc     = "Equalize split sizes when terminal is resized",
   callback = function() vim.cmd("tabdo wincmd =") end,
 })
+
+

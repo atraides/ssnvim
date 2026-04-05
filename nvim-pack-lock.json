@@ -5,11 +5,11 @@
       "src": "https://github.com/f-person/auto-dark-mode.nvim"
     },
     "gitsigns.nvim": {
-      "rev": "944ef13cc8d8fe8b846c91f36041c8dfb85ca000",
+      "rev": "4ed47e8c4c66c921dc1d6643977e0526e1f44396",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "lualine.nvim": {
-      "rev": "74114f0df664f14d7c228945693ba68a3b70a794",
+      "rev": "8811f3f3f4dc09d740c67e9ce399e7a541e2e5b2",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
     "mini.icons": {
@@ -17,7 +17,7 @@
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neovim-ayu": {
-      "rev": "bb3cb7e5c2e85deecd34cf9bc9d8bf688c39589d",
+      "rev": "761b1a5533d592b8a1134e3acfe5334bc7831551",
       "src": "https://github.com/atraides/neovim-ayu"
     },
     "noice.nvim": {
@@ -28,8 +28,18 @@
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
       "src": "https://github.com/MunifTanjim/nui.nvim"
     },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
+    "nvim-treesitter-textobjects": {
+      "rev": "93d60a475f0b08a8eceb99255863977d3a25f310",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+      "version": "'main'"
+    },
     "nvim-web-devicons": {
-      "rev": "d7462543c9e366c0d196c7f67a945eaaf5d99414",
+      "rev": "40e9d5a6cc3db11b309e39593fc7ac03bb844e38",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "snacks.nvim": {
