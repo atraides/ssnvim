@@ -2,5 +2,7 @@
   "auto-dark-mode.nvim": { "branch": "main", "commit": "54058b4fe414bd64bd2904a6f8a63f1f14e3d8df" },
   "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
   "lualine.nvim": { "branch": "master", "commit": "8811f3f3f4dc09d740c67e9ce399e7a541e2e5b2" },
-  "neovim-ayu": { "branch": "master", "commit": "c1b562cdc84086a0f943f2139fa274935e6d579b" }
+  "neovim-ayu": { "branch": "master", "commit": "c1b562cdc84086a0f943f2139fa274935e6d579b" },
+  "noice.nvim": { "branch": "main", "commit": "7bfd942445fb63089b59f97ca487d605e715f155" },
+  "nui.nvim": { "branch": "main", "commit": "de740991c12411b663994b2860f1a4fd0937c130" }
 }
