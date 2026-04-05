@@ -82,26 +82,34 @@ local Snacks = require("snacks")
 Snacks.setup({
 	animate = { enabled = true },
 	bigfile = { enabled = true },
+  bufdelete = { enabled = true },
 	dashboard = dashboard_config,
 	dim = { enabled = true },
 	explorer = { enabled = true },
+  gh = { enabled = true },
+  gitbrowse = { enabled = true },
 	image = { enabled = false },
 	indent = { enabled = true },
 	input = { enabled = true },
-	layout = { enabled = false },
+	layout = { enabled = true },
+  lazygit = { enabled = true },
 	notifier = { enabled = true },
 	quickfile = { enabled = true },
+  rename = { enabled = true },
 	scope = { enabled = true },
-	scratch = { enabled = false },
+	scratch = { enabled = true },
 	scroll = { enabled = true },
 	statuscolumn = statuscolumn_config,
 	terminal = { enabled = true },
 	toggle = { enabled = true },
-	words = { enabled = false },
-	zen = { enabled = false },
+	words = { enabled = true },
+	zen = { enabled = true },
+
 
 	picker = {
 		sources = {
+      gh_issue = {},
+      gh_pr = {},
 			files = {
 				hidden = true,
 				ignored = true,
@@ -111,7 +119,6 @@ Snacks.setup({
 							["<S-h>"] = "toggle_hidden",
 							["<S-i>"] = "toggle_ignored",
 							["<S-f>"] = "toggle_follow",
-							["<C-y>"] = { "yazi_copy_relative_path", mode = { "n", "i" } },
 						},
 					},
 				},
@@ -225,7 +232,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
 -- stylua: ignore start
 local   keymaps = {
-    -- { "<leader>l", function() vim.cmd("Lazy") end, desc = "Open Lazy tab", },
     -- Top Pickers & Explorer
     { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
     { "<leader>/", function() Snacks.picker.grep() end, desc = "Grep" },
@@ -306,17 +312,21 @@ local   keymaps = {
     { "<leader>fT", function() Snacks.terminal() end, desc = "Terminal (cwd)", mode = "n", },
     { "<leader>ft", function() Snacks.terminal(nil, { cwd = vim.fn.getcwd() }) end, desc = "Terminal (Root Dir)",  mode = "n", },
     { "<c-/>", function() Snacks.terminal() end, desc = "Toggle Terminal" },
-    -- -- Other
-    -- { "<leader>z",  function() Snacks.zen() end, desc = "Toggle Zen Mode" },
-    -- { "<leader>Z",  function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
-    -- { "<leader>.",  function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
-    -- { "<leader>S",  function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
-    -- { "<leader>n",  function() Snacks.notifier.show_history() end, desc = "Notification History" },
-    -- { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
-    -- { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File" },
-    -- { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git Browse", mode = { "n", "v" } },
-    -- { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
-    -- { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
+    -- GitHub
+    { "<leader>gi", function() Snacks.picker.gh_issue() end, desc = "GitHub Issues (open)" },
+    { "<leader>gI", function() Snacks.picker.gh_issue({ state = "all" }) end, desc = "GitHub Issues (all)" },
+    { "<leader>gp", function() Snacks.picker.gh_pr() end, desc = "GitHub Pull Requests (open)" },
+    { "<leader>gP", function() Snacks.picker.gh_pr({ state = "all" }) end, desc = "GitHub Pull Requests (all)" },
+    -- Other
+    { "<leader>z",  function() Snacks.zen() end, desc = "Toggle Zen Mode" },
+    { "<leader>Z",  function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
+    { "<leader>.",  function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
+    { "<leader>S",  function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
+    { "<leader>n",  function() Snacks.notifier.show_history() end, desc = "Notification History" },
+    { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File" },
+    { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git Browse", mode = { "n", "v" } },
+    { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
+    { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
     { "]]",         function() Snacks.words.jump(vim.v.count1) end, desc = "Next Reference", mode = { "n", "t" } },
     { "[[",         function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Reference", mode = { "n", "t" } },
 }
