@@ -52,8 +52,7 @@ return {
 			})
 
 			-- ── B. Capabilities — applied globally to all servers ───────────────
-			-- local capabilities = require("blink.cmp").get_lsp_capabilities()
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local capabilities = require("blink.cmp").get_lsp_capabilities()
 			vim.lsp.config("*", { capabilities = capabilities })
 
 			-- ── C. LspAttach keymaps ─────────────────────────────────────────────
