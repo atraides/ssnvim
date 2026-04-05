@@ -17,20 +17,18 @@ require("ayu").setup({
 	terminal = true,
 	overrides = {},
 })
-vim.cmd("colorscheme ayu")
 
 local colors = require("ayu.colors")
+local ayuline = require("ayu.lualine")
 
 -- ── Auto dark/light mode (macOS appearance sync) ──────────────────────────
 require("auto-dark-mode").setup({
 	update_interval = 1000,
 	set_dark_mode = function()
 		vim.cmd("colorscheme ayu-mirage")
-		colors.generate(true)
 	end,
 	set_light_mode = function()
 		vim.cmd("colorscheme ayu-light")
-		colors.generate()
 	end,
 })
 
@@ -94,69 +92,36 @@ ins_left({
 		return ""
 	end,
 	color = function()
-		local mode_color = {
-			n = colors.blue,
-			i = colors.green,
-			v = colors.magenta,
-			[" "] = colors.blue,
-			V = colors.magenta,
-			c = colors.warning,
-			no = colors.warning,
-			s = colors.opeator,
-			S = colors.operator,
-			ic = colors.yellow,
-			R = colors.green,
-			Rv = colors.green,
-			cv = colors.red,
-			ce = colors.red,
-			r = colors.cyan,
-			rm = colors.cyan,
-			["r?"] = colors.cyan,
-			["!"] = colors.red,
-			t = colors.red,
-		}
-		return { fg = mode_color[vim.fn.mode()] }
-	end,
-	padding = { left = 1, right = 1 },
+      return ayuline.mode_color(vim.fn.mode(),colors)
+  end,
+  padding = { left = 1, right = 1 },
 })
 
 ins_left({
 	"branch",
 	icon = "󰊢",
-	color = function()
-    return { fg = colors.green, gui = "bold" }
-  end,
+	color = ayuline.styles["branch"],
 })
 
 ins_left({
 	"filename",
 	cond = conditions.buffer_not_empty,
-	color = function()
-    return { fg = colors.magenta, gui = "bold" }
-  end,
+	color = ayuline.styles["filename"],
 })
 
 ins_left({
 	"diff",
 	-- Is it me or the symbol for modified us really weird
 	symbols = { added = " ", modified = " ", removed = " " },
-	diff_color = {
-		added = { fg = colors.vcs_added },
-		modified = { fg = colors.vcs_modified },
-		removed = { fg = colors.vcs_removed },
-	},
-	cond = conditions.hide_in_width,
+	diff_color = ayuline.styles["diff"],
+  cond = conditions.hide_in_width,
 })
 
 ins_left({
 	"diagnostics",
 	sources = { "nvim_diagnostic" },
 	symbols = { error = " ", warn = " ", info = " " },
-	diagnostics_color = {
-		error = { fg = colors.error },
-		warn = { fg = colors.warning },
-		info = { fg = colors.cyan },
-	},
+	diagnostics_color = ayuline.styles["diagnostics"],
 })
 
 ins_right({
@@ -173,25 +138,24 @@ ins_right({
 	ignore_lsp = { "stylua" },
 	-- Display the LSP name
 	show_name = true,
-	color = { fg = colors.black, gui = "bold" },
+	color = ayuline.styles["lsp_status"],
 })
 
-ins_right({ "location" })
+ins_right({
+  "location",
+  color = ayuline.styles["location"],
+})
 
 ins_right({
   "progress",
-  color = function()
-    return { fg = colors.fg, gui = "bold" }
-  end,
+	color = ayuline.styles["progress"],
 })
 
 ins_right({
 	function()
 		return "▊"
 	end,
-	color = function()
-    return { fg = colors.blue }
-  end,
+	color = ayuline.styles["line_close"],
 	padding = { left = 1 },
 })
 
