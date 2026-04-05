@@ -53,4 +53,5 @@ vim.opt.listchars = {
 }
 
 -- ── Completion ────────────────────────────────────────────────────────────
+vim.g.completion_mode = "native"
 vim.opt.completeopt = { "menuone", "noselect" }  -- blink.cmp compatible

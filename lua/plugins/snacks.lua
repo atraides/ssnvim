@@ -29,7 +29,7 @@ local dashboard_config = {
         end
       end
       local dir, file = fname:match("^(.*)/(.+)$")
-      return dir and { { dir .. "/", hl = "NotifyDEBUGTitle" }, { file, hl = "file" } } or { { fname, hl = "file" } }
+      return dir and { { dir .. "/", hl = "Normal" }, { file, hl = "file" } } or { { fname, hl = "file" } }
     end,
   },
 

@@ -186,7 +186,7 @@ wk.setup({
 })
 wk.add({
 	-- { "<leader><tab>", group = "tabs" },
-	-- { "<leader>c", group = "code" },
+	{ "<leader>c", group = "code" },
 	-- { "<leader>d", group = "debug" },
 	-- { "<leader>D", group = "Diffview", icon = { icon = "", color = "orange" } },
 	{ "<leader>p", group = "Yanky", icon = { icon = "󰃮 ", color = "yellow" } },
