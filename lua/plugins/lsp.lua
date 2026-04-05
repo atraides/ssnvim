@@ -11,9 +11,12 @@ return {
 			local registry = require("mason-registry")
 			local tools = {
 				-- Formatters (Phase 7 — conform.nvim)
+				"black", -- python formatting
 				"goimports", -- go import management + formatting
 				"shfmt", -- shell formatting
 				"stylua", -- lua formatting
+				"prettier", -- js/ts/html/css formatting
+				"taplo", -- toml formatting
 				-- Linters (Phase 7 — nvim-lint)
 				"golangci-lint", -- go multi-linter
 				"shellcheck", -- shell linting
@@ -90,27 +93,27 @@ return {
 
 			-- ── pyright — Python type checking + completions ─────────────────────
 			vim.lsp.config("pyright", {
-			  before_init = function(_, config)
-			    local cwd = vim.fn.getcwd()
-			    for _, candidate in ipairs({ "/.venv/bin/python", "/venv/bin/python" }) do
-			      local path = cwd .. candidate
-			      if vim.fn.executable(path) == 1 then
-			        config.settings = config.settings or {}
-			        config.settings.python = config.settings.python or {}
-			        config.settings.python.pythonPath = path
-			        return
-			      end
-			    end
-			  end,
-			  settings = {
-			    python = {
-			      analysis = {
-			        typeCheckingMode       = "strict",  -- not "strict" — practical balance
-			        autoSearchPaths        = true,
-			        useLibraryCodeForTypes = true,
-			      },
-			    },
-			  },
+				before_init = function(_, config)
+					local cwd = vim.fn.getcwd()
+					for _, candidate in ipairs({ "/.venv/bin/python", "/venv/bin/python" }) do
+						local path = cwd .. candidate
+						if vim.fn.executable(path) == 1 then
+							config.settings = config.settings or {}
+							config.settings.python = config.settings.python or {}
+							config.settings.python.pythonPath = path
+							return
+						end
+					end
+				end,
+				settings = {
+					python = {
+						analysis = {
+							typeCheckingMode = "strict", -- not "strict" — practical balance
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+						},
+					},
+				},
 			})
 
 			-- ── bashls — Bash/sh/zsh completions and hover ───────────────────────
@@ -198,6 +201,7 @@ return {
 			-- installed server — no explicit lspconfig[name].setup() calls needed.
 			require("mason-lspconfig").setup({
 				ensure_installed = {
+					"biome", -- JSON formatting + linting
 					"pyright", -- python type checking
 					"ruff", -- python linting + code actions
 					"gopls", -- go

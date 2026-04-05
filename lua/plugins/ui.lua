@@ -12,14 +12,15 @@ return {
 		lazy = false,
 		priority = 1000,
 		opts = {
-      mirage = true,
-      terminal = true,
-      overrides = {},
-    },
+			mirage = true,
+			terminal = true,
+			overrides = {},
+		},
 		config = function(_, opts)
-      require("ayu").setup({
-        vim.cmd("colorscheme ayu") -- initial load; auto-dark-mode overrides on first poll
-      })
+			require("ayu").setup({
+				options = opts,
+				vim.cmd("colorscheme ayu"), -- initial load; auto-dark-mode overrides on first poll
+			})
 		end,
 	},
 
@@ -49,141 +50,141 @@ return {
 		"nvim-lualine/lualine.nvim",
 		lazy = false,
 		config = function()
-      local colors = require("ayu.colors")
-      local ayuline = require("ayu.lualine")
-      local conditions = {
-        buffer_not_empty = function()
-          return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
-        end,
-        hide_in_width = function()
-          return vim.fn.winwidth(0) > 80
-        end,
-        check_git_workspace = function()
-          local filepath = vim.fn.expand("%:p:h")
-          local gitdir = vim.fn.finddir(".git", filepath .. ";")
-          return gitdir and #gitdir > 0 and #gitdir < #filepath
-        end,
-      }
-      local lualine_config = {
-        options = {
-          icons_enabled = true,
-          -- Disable sections and component separators
-          component_separators = "",
-          section_separators = "",
-          theme = "auto",
-        },
-        sections = {
-          -- these are to remove the defaults
-          lualine_a = {},
-          lualine_b = {},
-          lualine_y = {},
-          lualine_z = {},
-          -- These will be filled later
-          lualine_c = {},
-          lualine_x = {},
-        },
-        inactive_sections = {
-          -- these are to remove the defaults
-          lualine_a = {},
-          lualine_b = {},
-          lualine_y = {},
-          lualine_z = {},
-          lualine_c = {},
-          lualine_x = {},
-        },
-      }
+			local colors = require("ayu.colors")
+			local ayuline = require("ayu.lualine")
+			local conditions = {
+				buffer_not_empty = function()
+					return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
+				end,
+				hide_in_width = function()
+					return vim.fn.winwidth(0) > 80
+				end,
+				check_git_workspace = function()
+					local filepath = vim.fn.expand("%:p:h")
+					local gitdir = vim.fn.finddir(".git", filepath .. ";")
+					return gitdir and #gitdir > 0 and #gitdir < #filepath
+				end,
+			}
+			local lualine_config = {
+				options = {
+					icons_enabled = true,
+					-- Disable sections and component separators
+					component_separators = "",
+					section_separators = "",
+					theme = "auto",
+				},
+				sections = {
+					-- these are to remove the defaults
+					lualine_a = {},
+					lualine_b = {},
+					lualine_y = {},
+					lualine_z = {},
+					-- These will be filled later
+					lualine_c = {},
+					lualine_x = {},
+				},
+				inactive_sections = {
+					-- these are to remove the defaults
+					lualine_a = {},
+					lualine_b = {},
+					lualine_y = {},
+					lualine_z = {},
+					lualine_c = {},
+					lualine_x = {},
+				},
+			}
 
-      -- Inserts a component in lualine_c at left section
-      local function ins_left(component)
-        table.insert(lualine_config.sections.lualine_c, component)
-      end
+			-- Inserts a component in lualine_c at left section
+			local function ins_left(component)
+				table.insert(lualine_config.sections.lualine_c, component)
+			end
 
-      -- Inserts a component in lualine_x at right section
-      local function ins_right(component)
-        table.insert(lualine_config.sections.lualine_x, component)
-      end
+			-- Inserts a component in lualine_x at right section
+			local function ins_right(component)
+				table.insert(lualine_config.sections.lualine_x, component)
+			end
 
-      ins_left({
-        -- mode component
-        function()
-          return ""
-        end,
-        color = function()
-          return ayuline.mode_color(vim.fn.mode(),colors)
-        end,
-        padding = { left = 1, right = 1 },
-      })
+			ins_left({
+				-- mode component
+				function()
+					return ""
+				end,
+				color = function()
+					return ayuline.mode_color(vim.fn.mode(), colors)
+				end,
+				padding = { left = 1, right = 1 },
+			})
 
-      ins_left({
-        "branch",
-        icon = "󰊢",
-        color = ayuline.styles["branch"],
-      })
+			ins_left({
+				"branch",
+				icon = "󰊢",
+				color = ayuline.styles["branch"],
+			})
 
-      ins_left({
-        "filename",
-        cond = conditions.buffer_not_empty,
-        color = ayuline.styles["filename"],
-      })
+			ins_left({
+				"filename",
+				cond = conditions.buffer_not_empty,
+				color = ayuline.styles["filename"],
+			})
 
-      ins_left({
-        "diff",
-        -- Is it me or the symbol for modified us really weird
-        symbols = { added = " ", modified = " ", removed = " " },
-        diff_color = ayuline.styles["diff"],
-        cond = conditions.hide_in_width,
-      })
+			ins_left({
+				"diff",
+				-- Is it me or the symbol for modified us really weird
+				symbols = { added = " ", modified = " ", removed = " " },
+				diff_color = ayuline.styles["diff"],
+				cond = conditions.hide_in_width,
+			})
 
-      ins_left({
-        "diagnostics",
-        sources = { "nvim_diagnostic" },
-        symbols = { error = " ", warn = " ", info = " " },
-        diagnostics_color = ayuline.styles["diagnostics"],
-      })
+			ins_left({
+				"diagnostics",
+				sources = { "nvim_diagnostic" },
+				symbols = { error = " ", warn = " ", info = " " },
+				diagnostics_color = ayuline.styles["diagnostics"],
+			})
 
-      ins_right({
-        "lsp_status",
-        icon = "󰣖", -- f013
-        symbols = {
-          spinner = {},
-          -- Standard unicode symbol for when LSP is done:
-          done = "",
-          -- Delimiter inserted between LSP names:
-          separator = ", ",
-        },
-        -- List of LSP names to ignore (e.g., `null-ls`):
-        ignore_lsp = { "stylua" },
-        -- Display the LSP name
-        show_name = true,
-        color = ayuline.styles["lsp_status"],
-      })
+			ins_right({
+				"lsp_status",
+				icon = "󰣖", -- f013
+				symbols = {
+					spinner = {},
+					-- Standard unicode symbol for when LSP is done:
+					done = "",
+					-- Delimiter inserted between LSP names:
+					separator = ", ",
+				},
+				-- List of LSP names to ignore (e.g., `null-ls`):
+				ignore_lsp = { "stylua" },
+				-- Display the LSP name
+				show_name = true,
+				color = ayuline.styles["lsp_status"],
+			})
 
-      ins_right({
-        "location",
-        color = ayuline.styles["location"],
-      })
+			ins_right({
+				"location",
+				color = ayuline.styles["location"],
+			})
 
-      ins_right({
-        "progress",
-        color = ayuline.styles["progress"],
-      })
+			ins_right({
+				"progress",
+				color = ayuline.styles["progress"],
+			})
 
-      ins_right({
-        function()
-          return "▊"
-        end,
-        color = ayuline.styles["line_close"],
-        padding = { left = 1 },
-      })
+			ins_right({
+				function()
+					return "▊"
+				end,
+				color = ayuline.styles["line_close"],
+				padding = { left = 1 },
+			})
 
 			require("lualine").setup({
-        options = {
-          icons_enabled = true,
-          -- Disable sections and component separators
-          component_separators = "",
-          section_separators = "",
-          theme = "auto",
-        },
+				options = {
+					icons_enabled = true,
+					-- Disable sections and component separators
+					component_separators = "",
+					section_separators = "",
+					theme = "auto",
+				},
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = { "branch", "diff", "diagnostics" },
@@ -193,10 +194,10 @@ return {
 					lualine_z = { "location" },
 				},
 			})
-    require("lualine").setup(lualine_config)
+			require("lualine").setup(lualine_config)
 		end,
 	},
-  	{
+	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
 		opts = {
@@ -226,12 +227,12 @@ return {
 			})
 		end,
 	},
-  {
-    "folke/todo-comments.nvim",
-    lazy = false,
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      require("todo-comments").setup()
-    end,
-  },
+	{
+		"folke/todo-comments.nvim",
+		lazy = false,
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function()
+			require("todo-comments").setup()
+		end,
+	},
 }

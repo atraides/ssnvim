@@ -9,13 +9,13 @@ return {
 	-- LSP client is authenticated and attached before the first keystroke.
 	-- suggestion and panel are disabled: blink.cmp handles all completion display.
 	{
-	  "zbirenbaum/copilot.lua",
-	  cmd   = "Copilot",       -- allow :Copilot auth / :Copilot status from normal mode
-	  event = "InsertEnter",   -- attach LSP client on first insert (not needed at startup)
-	  opts  = {
-	    suggestion = { enabled = false },  -- disable inline ghost text — blink handles this
-	    panel      = { enabled = false },  -- disable copilot panel
-	  },
+		"zbirenbaum/copilot.lua",
+		cmd = "Copilot", -- allow :Copilot auth / :Copilot status from normal mode
+		event = "InsertEnter", -- attach LSP client on first insert (not needed at startup)
+		opts = {
+			suggestion = { enabled = false }, -- disable inline ghost text — blink handles this
+			panel = { enabled = false }, -- disable copilot panel
+		},
 	},
 
 	-- ── SPEC 2: blink.cmp — completion engine ────────────────────────────────
@@ -45,18 +45,18 @@ return {
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer", "copilot" },
 				providers = {
-				  copilot = {
-				    name         = "copilot",
-				    module       = "blink-copilot",
-				    score_offset = 100,
-				    async        = true,
-				    opts         = {
-				      max_completions = 3,      -- show up to 3 Copilot suggestions at a time
-				      kind_icon       = " ",  -- icon shown in completion menu
-				      kind_name       = "Copilot",
-				      debounce        = 200,    -- ms before firing a Copilot request
-				    },
-				  },
+					copilot = {
+						name = "copilot",
+						module = "blink-copilot",
+						score_offset = 100,
+						async = true,
+						opts = {
+							max_completions = 3, -- show up to 3 Copilot suggestions at a time
+							kind_icon = " ", -- icon shown in completion menu
+							kind_name = "Copilot",
+							debounce = 200, -- ms before firing a Copilot request
+						},
+					},
 				},
 			},
 			fuzzy = { implementation = "prefer_rust_with_warning" },
