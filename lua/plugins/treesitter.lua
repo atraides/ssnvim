@@ -14,6 +14,11 @@ vim.pack.add({
 require("nvim-treesitter").setup({})
 require("nvim-treesitter").install({
 	"lua",
+  "python",
+  "json",
+  "markdown",
+  "markdown_inline",
+  "dockerfile",
 })
 
 require("nvim-treesitter-textobjects").setup({
@@ -106,5 +111,4 @@ vim.api.nvim_create_autocmd("FileType", {
 		end
 	end,
 })
-
 
