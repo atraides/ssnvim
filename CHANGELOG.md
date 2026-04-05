@@ -1,3 +1,31 @@
+## v0.3.0 (2026-04-05)
+
+### Feat
+
+- add diffview, nvim-lint, autopairs; refactor configs into plugin files
+- **formatting**: add Phase 7 conform.nvim with formatter stack
+- **completion**: add Phase 6 completion stack with blink.cmp and Copilot
+- **treesitter**: add Phase 4 treesitter, textobjects, and gh-actions grammar
+- **lsp**: add Phase 5 LSP stack and enhance snacks dashboard
+- **snacks**: add snacks.nvim as navigation and UI hub
+- **editor**: add Phase 3 editor plugins and todo-comments
+- **ui**: add noice.nvim for enhanced cmdline and notification UI
+- bootstrap foundation config and UI layer (phases 1-2)
+- Hard reset, to start with a clean slate
+- **lsp**: implement Phase 5 — LSP config with native completion and keymaps
+- **treesitter**: implement Phase 4 — treesitter with textobjects, folds, and buffer nav
+- **phase-3**: add snacks.nvim, noice, which-key, and gitsigns
+- **ui**: replace witch-line with lualine.nvim statusline
+- add foundation config and UI layer (phases 1-2)
+- Recreate with native plugin support and nvim 0.12
+
+### Fix
+
+- **TS**: Add additional languages
+- Enable snacks.vim features
+- Fix coloring issues with the statusline
+- migrate vim.hl API, disable unused providers, remove witch-line lock entry
+
 ## v0.2.3 (2026-04-02)
 
 ### Fix
