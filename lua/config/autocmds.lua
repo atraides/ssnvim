@@ -7,6 +7,10 @@ vim.filetype.add({
 		[".*/templates/.*%.yml"] = "helm",
 		[".*/templates/.*%.tpl"] = "helm",
 		["helmfile.*%.yaml"] = "helm",
+		-- GitHub Actions workflow files — sets ft=yaml.github-actions so gh_actions_ls attaches.
+		-- Pattern matches the full absolute file path; %.github escapes the dot (Lua pattern).
+		-- %.ya?ml matches both .yml (a is optional) and .yaml in a single pattern.
+		[".*/%.github/workflows/.*%.ya?ml"] = "yaml.github-actions",
 	},
 })
 

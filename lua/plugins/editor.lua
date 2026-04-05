@@ -56,12 +56,23 @@ return {
 						return require("which-key.extras").expand.win()
 					end,
 				},
-				{ "<leader>f", group = "find" },
-				{ "<leader>g", group = "git" },
-				{ "<leader>t", group = "terminal" },
-				{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
-				{ "z", group = "fold" },
+			{ "<leader>f", group = "find" },
+			{ "<leader>g", group = "git" },
+			{ "<leader>t", group = "terminal" },
+			{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+			{ "<leader>c", group = "code" },
+			{ "<leader>l", group = "lsp" },
+			{ "z", group = "fold" },
 			},
 		},
+	},
+
+	-- ── Auto-close brackets and quotes: nvim-autopairs ──────────────────────
+	-- Pairs are inserted on the character that opens them, so InsertEnter is fine.
+	-- Loads only when the user enters insert mode — saves startup time.
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		opts = {},
 	},
 }

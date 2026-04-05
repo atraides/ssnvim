@@ -177,23 +177,6 @@ return {
 				padding = { left = 1 },
 			})
 
-			require("lualine").setup({
-				options = {
-					icons_enabled = true,
-					-- Disable sections and component separators
-					component_separators = "",
-					section_separators = "",
-					theme = "auto",
-				},
-				sections = {
-					lualine_a = { "mode" },
-					lualine_b = { "branch", "diff", "diagnostics" },
-					lualine_c = { { "filename", path = 1 } }, -- path=1 → show relative path
-					lualine_x = { "filetype" },
-					lualine_y = { "progress" },
-					lualine_z = { "location" },
-				},
-			})
 			require("lualine").setup(lualine_config)
 		end,
 	},

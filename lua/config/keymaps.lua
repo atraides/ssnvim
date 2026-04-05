@@ -44,3 +44,43 @@ vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
 -- ── Diagnostic navigation ─────────────────────────────────────────────────
 -- Works without LSP (e.g. nvim-lint diagnostics); LSP adds more in plugins/lsp.lua
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+
+-- Git status / changed files view
+vim.keymap.set("n", "<leader>gd", "<Cmd>DiffviewOpen<CR>", { desc = "Diff: git status" })
+-- File history views
+vim.keymap.set("n", "<leader>gv", "<Cmd>DiffviewFileHistory<CR>", { desc = "Diff: repo history" })
+vim.keymap.set("n", "<leader>gV", "<Cmd>DiffviewFileHistory %<CR>", { desc = "Diff: current file history" })
+
+-- Visual mode: history of selected lines
+vim.keymap.set("v", "<leader>gv", ":'<,'>DiffviewFileHistory<CR>", { desc = "Diff: selection history" })
+
+-- Compare with revisions (prompts)
+vim.keymap.set("n", "<leader>gc", function()
+	vim.ui.input({ prompt = "Compare revision (ex. main, HEAD~5, main..HEAD): " }, function(refs)
+		if refs and refs:match("%S") then
+			vim.cmd(("DiffviewOpen %s"):format(refs))
+		end
+	end)
+end, { desc = "Diff: compare revisions" })
+
+vim.keymap.set("n", "<leader>gC", function()
+	vim.ui.input({ prompt = "File history range (ex. HEAD~1, main..HEAD): " }, function(range)
+		if range and range:match("%S") then
+			vim.cmd(("DiffviewFileHistory --range=%s %%"):format(range))
+		end
+	end)
+end, { desc = "Diff: file history with range" })
+
+-- Compare two arbitrary files
+vim.keymap.set("n", "<leader>g2", function()
+	vim.ui.input({ prompt = "First file: " }, function(file1)
+		if not file1 or not file1:match("%S") then
+			return
+		end
+		vim.ui.input({ prompt = "Second file: " }, function(file2)
+			if file2 and file2:match("%S") then
+				vim.cmd(("tabnew | e %s | diffthis | vsplit %s | diffthis"):format(file1, file2))
+			end
+		end)
+	end)
+end, { desc = "Diff: Compare 2 files" })
