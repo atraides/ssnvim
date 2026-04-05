@@ -3,23 +3,19 @@
 return {
 
   -- ── File manager: oil.nvim ───────────────────────────────────────────────
-  -- Edits the filesystem like a buffer. `-` opens the parent directory of the
-  -- current file. `g?` inside oil shows all oil keybindings.
-  -- lazy=false: `-` must work from the first buffer (including dashboard/scratch).
-  -- If lazy-loaded via keys, the first press triggers load but does nothing.
   {
     "stevearc/oil.nvim",
     lazy = false,
     keys = {
       { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
     },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
     opts = {},  -- oil defaults are sufficient for MVP
   },
 
   -- ── Git decorations: gitsigns.nvim ──────────────────────────────────────
-  -- Shows added/changed/removed line signs in the sign column.
-  -- Hunk navigation and operations registered per-buffer via on_attach.
-  -- BufReadPre: attach before buffer renders so signs appear on the first frame.
   {
     "lewis6991/gitsigns.nvim",
     event = "BufReadPre",
@@ -32,45 +28,6 @@ return {
         changedelete = { text = "▎" },
         untracked    = { text = "▎" },
       },
-
-      -- on_attach: buffer-local keymaps — only active in Git-tracked buffers.
-      -- Defined here (not in keymaps.lua) so they don't pollute non-git buffers.
-      on_attach = function(bufnr)
-        local gs = package.loaded.gitsigns
-
-        -- Hunk navigation — mirrors ]d/[d diagnostic navigation convention.
-        -- vim.wo.diff guard: in diff mode, use native ]c/[c instead of gitsigns.
-        vim.keymap.set("n", "]h", function()
-          if vim.wo.diff then
-            vim.cmd.normal({ "]c", bang = true })
-          else
-            gs.next_hunk()
-          end
-        end, { buffer = bufnr, desc = "Next hunk" })
-
-        vim.keymap.set("n", "[h", function()
-          if vim.wo.diff then
-            vim.cmd.normal({ "[c", bang = true })
-          else
-            gs.prev_hunk()
-          end
-        end, { buffer = bufnr, desc = "Prev hunk" })
-
-        -- Hunk operations (<leader>g* — git group)
-        vim.keymap.set("n", "<leader>gs", gs.stage_hunk,                { buffer = bufnr, desc = "Stage hunk"        })
-        vim.keymap.set("n", "<leader>gr", gs.reset_hunk,                { buffer = bufnr, desc = "Reset hunk"        })
-        vim.keymap.set("n", "<leader>gp", gs.preview_hunk,              { buffer = bufnr, desc = "Preview hunk"      })
-        vim.keymap.set("n", "<leader>gb", gs.toggle_current_line_blame, { buffer = bufnr, desc = "Toggle line blame" })
-
-        -- Visual-mode partial hunk staging/reset (operate on selected lines only)
-        vim.keymap.set("v", "<leader>gs", function()
-          gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { buffer = bufnr, desc = "Stage hunk (visual)" })
-
-        vim.keymap.set("v", "<leader>gr", function()
-          gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { buffer = bufnr, desc = "Reset hunk (visual)" })
-      end,
     },
   },
 
@@ -82,10 +39,6 @@ return {
     "folke/which-key.nvim",
     event = "VeryLazy",
     opts  = {
-      -- Register group names for all <leader>* prefix groups.
-      -- <leader>l and <leader>c are defined here even though their keymaps
-      -- are added in Phase 5 (LSP) and Phase 7 (format/lint) respectively.
-      -- which-key shows the group label; individual keymaps populate it later.
       preset = "helix",
       spec = {
         {
