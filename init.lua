@@ -1,21 +1,6 @@
--- ssnvim — entry point
--- Leader must be set BEFORE lazy.nvim bootstraps so plugin keymaps inherit it.
+-- ── SSNvim entry point ───────────────────────────────────────────────────
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
-
-if vim.env.PROF then
-	-- example for lazy.nvim
-	-- change this to the correct path for your plugin manager
-	local snacks = vim.fn.stdpath("data") .. "/lazy/snacks.nvim"
-	vim.opt.rtp:append(snacks)
-	require("snacks.profiler").startup({
-		startup = {
-			event = "VimEnter", -- stop profiler on this event. Defaults to `VimEnter`
-			-- event = "UIEnter",
-			-- event = "VeryLazy",
-		},
-	})
-end
 
 -- ── Bootstrap lazy.nvim ───────────────────────────────────────────────────
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -42,9 +27,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- ── Load config modules ───────────────────────────────────────────────────
-require("config.options")
-require("config.keymaps")
-require("config.autocmds")
+require("config")
 
 -- ── Initialise lazy.nvim ──────────────────────────────────────────────────
 require("lazy").setup({

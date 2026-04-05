@@ -2,19 +2,25 @@
 
 return {
 
-	-- ── Colorscheme: Rosé Pine ──────────────────────────────────────────────
+	-- ── Colorscheme: Ayu ──────────────────────────────────────────────
 	-- Loaded eagerly (lazy=false) and at highest priority so it is applied
 	-- before any other plugin can render with the wrong colours.
-	-- auto-dark-mode.nvim handles variant switching (moon↔dawn) at runtime.
+	-- auto-dark-mode.nvim handles variant switching (mirage↔light) at runtime.
 	{
 		"atraides/neovim-ayu",
+		name = "neovim-ayu", -- alias required; repo slug "neovim" collides with Neovim runtime
 		lazy = false,
 		priority = 1000,
 		opts = {
-			mirage = false,
+			mirage = true,
+			terminal = true,
+			overrides = {},
 		},
 		config = function(_, opts)
-			require("ayu").setup(opts)
+			require("ayu").setup({
+				options = opts,
+				vim.cmd("colorscheme ayu"), -- initial load; auto-dark-mode overrides on first poll
+			})
 		end,
 	},
 
@@ -28,7 +34,7 @@ return {
 			require("auto-dark-mode").setup({
 				update_interval = 1000, -- poll every 1 s
 				set_dark_mode = function()
-					vim.cmd("colorscheme ayu-dark")
+					vim.cmd("colorscheme ayu-mirage")
 				end,
 				set_light_mode = function()
 					vim.cmd("colorscheme ayu-light")
@@ -42,10 +48,10 @@ return {
 	-- lualine_z right-side includes the cached K8s context component.
 	{
 		"nvim-lualine/lualine.nvim",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
 		lazy = false,
 		config = function()
 			local colors = require("ayu.colors")
+			local ayuline = require("ayu.lualine")
 			local conditions = {
 				buffer_not_empty = function()
 					return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
@@ -59,14 +65,13 @@ return {
 					return gitdir and #gitdir > 0 and #gitdir < #filepath
 				end,
 			}
-
 			local lualine_config = {
 				options = {
 					icons_enabled = true,
 					-- Disable sections and component separators
 					component_separators = "",
 					section_separators = "",
-					theme = "ayu",
+					theme = "auto",
 				},
 				sections = {
 					-- these are to remove the defaults
@@ -105,62 +110,28 @@ return {
 					return ""
 				end,
 				color = function()
-					local mode_color = {
-						n = colors.blue,
-						i = colors.green,
-						v = colors.magenta,
-						[" "] = colors.blue,
-						V = colors.magenta,
-						c = colors.warning,
-						no = colors.warning,
-						s = colors.opeator,
-						S = colors.operator,
-						ic = colors.yellow,
-						R = colors.green,
-						Rv = colors.green,
-						cv = colors.red,
-						ce = colors.red,
-						r = colors.cyan,
-						rm = colors.cyan,
-						["r?"] = colors.cyan,
-						["!"] = colors.red,
-						t = colors.red,
-					}
-					return { fg = mode_color[vim.fn.mode()] }
+					return ayuline.mode_color(vim.fn.mode(), colors)
 				end,
 				padding = { left = 1, right = 1 },
 			})
 
 			ins_left({
 				"branch",
-				icon = "",
-				color = { fg = colors.magenta },
-			})
-
-			ins_left({
-				"filetype",
-				cond = conditions.buffer_not_empty,
-				colored = true, -- Displays filetype icon in color if set to true
-				icon_only = true, -- Display only an icon for filetype
-				padding = { right = 0, left = 1 },
+				icon = "󰊢",
+				color = ayuline.styles["branch"],
 			})
 
 			ins_left({
 				"filename",
 				cond = conditions.buffer_not_empty,
-				color = { fg = colors.magenta, gui = "bold" },
-				padding = { right = 1, left = 0 },
+				color = ayuline.styles["filename"],
 			})
 
 			ins_left({
 				"diff",
 				-- Is it me or the symbol for modified us really weird
 				symbols = { added = " ", modified = " ", removed = " " },
-				diff_color = {
-					added = { fg = colors.vcs_added },
-					modified = { fg = colors.vcs_modified },
-					removed = { fg = colors.vcs_removed },
-				},
+				diff_color = ayuline.styles["diff"],
 				cond = conditions.hide_in_width,
 			})
 
@@ -168,11 +139,7 @@ return {
 				"diagnostics",
 				sources = { "nvim_diagnostic" },
 				symbols = { error = " ", warn = " ", info = " " },
-				diagnostics_color = {
-					error = { fg = colors.error },
-					warn = { fg = colors.warning },
-					info = { fg = colors.cyan },
-				},
+				diagnostics_color = ayuline.styles["diagnostics"],
 			})
 
 			ins_right({
@@ -189,18 +156,24 @@ return {
 				ignore_lsp = { "stylua" },
 				-- Display the LSP name
 				show_name = true,
-				color = { fg = colors.black, gui = "bold" },
+				color = ayuline.styles["lsp_status"],
 			})
 
-			ins_right({ "location" })
+			ins_right({
+				"location",
+				color = ayuline.styles["location"],
+			})
 
-			ins_right({ "progress", color = { fg = colors.fg, gui = "bold" } })
+			ins_right({
+				"progress",
+				color = ayuline.styles["progress"],
+			})
 
 			ins_right({
 				function()
 					return "▊"
 				end,
-				color = { fg = colors.blue },
+				color = ayuline.styles["line_close"],
 				padding = { left = 1 },
 			})
 
@@ -214,30 +187,25 @@ return {
 			-- add any options here
 		},
 		dependencies = {
-			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
 			"MunifTanjim/nui.nvim",
-			-- OPTIONAL:
-			--   `nvim-notify` is only needed, if you want to use the notification view.
-			--   If not available, we use `mini` as the fallback
-			"rcarriga/nvim-notify",
 		},
 		config = function()
 			require("noice").setup({
-				lsp = {
-					-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-					override = {
-						["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-						["vim.lsp.util.stylize_markdown"] = true,
-						["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
-					},
-				},
+				-- lsp = {
+				-- 	-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+				-- 	override = {
+				-- 		["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+				-- 		["vim.lsp.util.stylize_markdown"] = true,
+				-- 		["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+				-- 	},
+				-- },
 				-- you can enable a preset for easier configuration
 				presets = {
 					bottom_search = true, -- use a classic bottom cmdline for search
 					command_palette = true, -- position the cmdline and popupmenu together
 					long_message_to_split = true, -- long messages will be sent to a split
 					inc_rename = false, -- enables an input dialog for inc-rename.nvim
-					lsp_doc_border = false, -- add a border to hover docs and signature help
+					lsp_doc_border = true, -- add a border to hover docs and signature help
 				},
 			})
 		end,

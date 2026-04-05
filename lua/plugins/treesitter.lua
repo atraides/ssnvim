@@ -2,78 +2,92 @@
 
 return {
 
-  -- ── Treesitter: syntax highlighting + indent + incremental selection ────
-  -- Uses config = function() because nvim-treesitter requires explicit
-  -- require("nvim-treesitter.configs").setup() — opts = {} alone does nothing.
-  -- Loads lazily on BufReadPost (existing files) and BufNewFile (new buffers).
-  {
-    "nvim-treesitter/nvim-treesitter",
-    -- TODO: Eventually replace this with the rewritten branch and the universal loader which I used earlier
-    branch = "master",     -- v1.0 main-branch rewrite removed nvim-treesitter.configs; master has the stable API
-    build  = ":TSUpdate",  -- recompile grammars after install/update
-    event  = { "BufReadPost", "BufNewFile" },
-    dependencies = {
-      -- gh-actions.nvim registers the gh_actions_expressions grammar.
-      -- Must be a dependency (not a separate spec) so it loads before
-      -- this config function runs.
-      "Hdoc1509/gh-actions.nvim",
-    },
-    config = function()
-      -- MUST precede nvim-treesitter.configs.setup() so the grammar is
-      -- registered in the parser list before auto-install runs.
-      require("gh-actions.tree-sitter").setup()
+	-- ── Treesitter: syntax highlighting + indent + incremental selection ────
+	{
+		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
+		build = ":TSUpdate",
+		event = { "BufReadPost", "BufNewFile" },
+		dependencies = {
+			"Hdoc1509/gh-actions.nvim",
+		},
+		config = function()
+			require("gh-actions.tree-sitter").setup()
+			require("nvim-treesitter").setup({})
+			require("nvim-treesitter").install({
+				"python",
+				"go",
+				"gomod",
+				"bash",
+				"yaml",
+				"helm",
+				"json",
+				"lua",
+				"markdown",
+				"markdown_inline",
+				"dockerfile",
+				"gh_actions_expressions", -- injected grammar for ${{ }} expression highlighting
+			})
+		end,
+	},
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		branch = "main",
+		init = function()
+			vim.g.no_plugin_maps = true
+			-- ── Select keymaps ───────────────────────────────────────────────
+			local sel = require("nvim-treesitter-textobjects.select")
+			for _, map in ipairs({
+				{ { "x", "o" }, "af", "@function.outer" },
+				{ { "x", "o" }, "if", "@function.inner" },
+				{ { "x", "o" }, "ac", "@class.outer" },
+				{ { "x", "o" }, "ic", "@class.inner" },
+				{ { "x", "o" }, "aa", "@parameter.outer" },
+				{ { "x", "o" }, "ia", "@parameter.inner" },
+				{ { "x", "o" }, "ad", "@comment.outer" },
+				{ { "x", "o" }, "as", "@statement.outer" },
+			}) do
+				vim.keymap.set(map[1], map[2], function()
+					sel.select_textobject(map[3], "textobjects")
+				end, { desc = "Select " .. map[3] })
+			end
 
-      require("nvim-treesitter.configs").setup({
-
-        -- Parsers to install automatically on first launch.
-        -- markdown_inline is always paired with markdown (handles inline code/bold/italic).
-        -- helm uses the combined YAML + Go-template grammar — do NOT use gotmpl.
-        ensure_installed = {
-          "python",
-          "go",
-          "gomod",
-          "bash",
-          "yaml",
-          "helm",
-          "json",
-          "lua",
-          "markdown",
-          "markdown_inline",
-          "dockerfile",
-          "gh_actions_expressions",  -- injected grammar for ${{ }} expression highlighting
-        },
-
-        -- Never auto-install parsers for every filetype encountered.
-        -- Keep the install list explicit.
-        auto_install = false,
-
-        -- ── Highlight ──────────────────────────────────────────────────────
-        -- Replaces Neovim's regex-based ft highlighting with grammar-accurate
-        -- highlighting. Helm files show Go-template expressions differently
-        -- from surrounding YAML keys.
-        highlight = { enable = true },
-
-        -- ── Indent ─────────────────────────────────────────────────────────
-        -- Enables the = operator to re-indent by treesitter grammar rather
-        -- than by Neovim's built-in indentation heuristic.
-        indent = { enable = true },
-
-        -- ── Incremental selection ───────────────────────────────────────────
-        -- <CR> in normal mode starts a visual selection on the current node.
-        -- <CR> again expands to the parent node; <BS> shrinks back.
-        -- scope_incremental disabled — not needed for MVP.
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection    = "<A-o>",   -- start selection on current node
-            node_incremental  = "<A-o>",   -- expand to parent node
-            node_decremental  = "<A-i>",   -- shrink to child node
-            scope_incremental = false,    -- disable scope expansion
-          },
-        },
-
-      })
-    end,
-  },
-
+			-- ── Move keymaps ─────────────────────────────────────────────────
+			local mv = require("nvim-treesitter-textobjects.move")
+			for _, map in ipairs({
+				{ { "n", "x", "o" }, "]m", mv.goto_next_start, "@function.outer" },
+				{ { "n", "x", "o" }, "[m", mv.goto_previous_start, "@function.outer" },
+				{ { "n", "x", "o" }, "]]", mv.goto_next_start, "@class.outer" },
+				{ { "n", "x", "o" }, "[[", mv.goto_previous_start, "@class.outer" },
+				{ { "n", "x", "o" }, "]M", mv.goto_next_end, "@function.outer" },
+				{ { "n", "x", "o" }, "[M", mv.goto_previous_end, "@function.outer" },
+				{ { "n", "x", "o" }, "]o", mv.goto_next_start, { "@loop.inner", "@loop.outer" } },
+				{ { "n", "x", "o" }, "[o", mv.goto_previous_start, { "@loop.inner", "@loop.outer" } },
+			}) do
+				local modes, lhs, fn, query = map[1], map[2], map[3], map[4]
+				local qstr = (type(query) == "table") and table.concat(query, ",") or query
+				vim.keymap.set(modes, lhs, function()
+					fn(query, "textobjects")
+				end, { desc = "Move to " .. qstr })
+			end
+		end,
+		config = function()
+			require("nvim-treesitter-textobjects").setup({
+				select = {
+					enable = true,
+					lookahead = true,
+					selection_modes = {
+						["@parameter.outer"] = "v", -- charwise
+						["@function.outer"] = "V", -- linewise
+						["@class.outer"] = "<c-v>", -- blockwise
+					},
+					include_surrounding_whitespace = false,
+				},
+				move = {
+					enable = true,
+					set_jumps = true,
+				},
+			})
+		end,
+	},
 }
