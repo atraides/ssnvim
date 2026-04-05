@@ -13,7 +13,64 @@ return {
       animate = { enabled = true },
       bigfile = { enabled = true },
       bufdelete = { enabled = true },
-      dashboard = { enabled = true },
+      dashboard = {
+        enabled = true,
+        width = 60,
+        -- item field formatters
+        formats = {
+          icon = function(item)
+            if item.file and item.icon == "file" or item.icon == "directory" then
+              return Snacks.dashboard.icon(item.file, item.icon)
+            end
+            return { item.icon, width = 2, hl = "icon" }
+          end,
+          footer = { "%s", align = "center" },
+          header = { "%s", align = "center" },
+          file = function(item, ctx)
+            local fname = vim.fn.fnamemodify(item.file, ":~")
+            fname = ctx.width and #fname > ctx.width and vim.fn.pathshorten(fname) or fname
+            if #fname > ctx.width then
+              local dir = vim.fn.fnamemodify(fname, ":h")
+              local file = vim.fn.fnamemodify(fname, ":t")
+              if dir and file then
+                file = file:sub(-(ctx.width - #dir - 2))
+                fname = dir .. "/…" .. file
+              end
+            end
+            local dir, file = fname:match("^(.*)/(.+)$")
+            return dir and { { dir .. "/", hl = "Normal" }, { file, hl = "file" } } or { { fname, hl = "file" } }
+          end,
+        },
+
+        sections = {
+          { section = "header" },
+          {
+            pane = 2,
+            section = "terminal",
+            cmd = "colorscript -e square",
+            height = 5,
+            padding = 1,
+          },
+          { section = "keys", gap = 1, padding = 1 },
+          { pane = 2, icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+          { pane = 2, icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+          {
+            pane = 2,
+            icon = " ",
+            title = "Git Status",
+            section = "terminal",
+            enabled = function()
+              return Snacks.git.get_root() ~= nil
+            end,
+            cmd = "git status --short --branch --renames",
+            height = 5,
+            padding = 1,
+            ttl = 5 * 60,
+            indent = 3,
+          },
+          { section = "startup" },
+        },
+      },
       dim = { enabled = true },
       explorer = { enabled = true },
       gh = { enabled = true },
@@ -29,7 +86,20 @@ return {
       scope = { enabled = true },
       scratch = { enabled = true },
       scroll = { enabled = true },
-      statuscolumn = { enabled = true },
+      statuscolumn = {
+        enabled = true,
+        left = { "mark", "sign" }, -- priority of signs on the left (high to low)
+        right = { "fold", "git" }, -- priority of signs on the right (high to low)
+        folds = {
+          open = false, -- show open fold icons
+          git_hl = false, -- use Git Signs hl for fold icons
+        },
+        git = {
+          -- patterns to match Git signs
+          patterns = { "GitSign", "MiniDiffSign" },
+        },
+        refresh = 50, -- refresh at most every 50ms
+      },
       terminal = { enabled = true },
       toggle = { enabled = true },
       words = { enabled = true },
@@ -131,8 +201,12 @@ return {
       },
       styles = {
         notification = {
-          -- wo = { wrap = true } -- Wrap notifications
-        }
+          wo = { wrap = true } -- Wrap notifications
+        },
+        lazygit = {
+          border = true,
+          backdrop = false,
+        },
       },
     },
     keys = {
