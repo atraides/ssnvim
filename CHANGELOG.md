@@ -1,3 +1,9 @@
+## v0.3.1 (2026-04-05)
+
+### Fix
+
+- **conform**: register keymaps in init hook so they load before plugin events
+
 ## v0.3.0 (2026-04-05)
 
 ### Feat
