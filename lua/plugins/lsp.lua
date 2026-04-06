@@ -44,49 +44,51 @@ return {
 		},
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-		-- ── A. Diagnostic display config ────────────────────────────────────
-		vim.diagnostic.config({
-			virtual_text = { spacing = 4, prefix = "󰅁" },
-			signs = true,
-			underline = true,
-			update_in_insert = false, -- don't interrupt typing with diagnostic updates
-			severity_sort = true,
-			float = { border = "rounded", source = true },
-			on_jump = { float = true }, -- show float automatically when jumping to a diagnostic
-		})
+			-- ── A. Diagnostic display config ────────────────────────────────────
+			vim.diagnostic.config({
+				virtual_text = { spacing = 4, prefix = "󰅁" },
+				signs = true,
+				underline = true,
+				update_in_insert = false, -- don't interrupt typing with diagnostic updates
+				severity_sort = true,
+				float = { border = "rounded", source = true },
+				-- NOTE: float-on-jump is handled by the [d/]d keymaps in config/keymaps.lua
+				-- via the on_jump callback on vim.diagnostic.jump(). The old top-level
+				-- `on_jump` key here was silently ignored — it is not a valid Opts field.
+			})
 
 			-- ── B. Capabilities — applied globally to all servers ───────────────
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
 			vim.lsp.config("*", { capabilities = capabilities })
 
-		-- ── C. LspAttach keymaps ─────────────────────────────────────────────
-		-- Buffer-local keymaps registered only when an LSP client attaches.
-		-- NOTE: [d, ]d global diagnostic navigation is in keymaps.lua.
-		-- NOTE: <leader>l group label is registered in editor.lua which-key spec.
-		local lsp_group = vim.api.nvim_create_augroup("ssnvim_lsp", { clear = true })
-		vim.api.nvim_create_autocmd("LspAttach", {
-			group = lsp_group,
-			callback = function(event)
-				local map = function(keys, fn, desc)
-					vim.keymap.set("n", keys, fn, { buffer = event.buf, desc = desc })
-				end
+			-- ── C. LspAttach keymaps ─────────────────────────────────────────────
+			-- Buffer-local keymaps registered only when an LSP client attaches.
+			-- NOTE: [d, ]d global diagnostic navigation is in keymaps.lua.
+			-- NOTE: <leader>l group label is registered in editor.lua which-key spec.
+			local lsp_group = vim.api.nvim_create_augroup("ssnvim_lsp", { clear = true })
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = lsp_group,
+				callback = function(event)
+					local map = function(keys, fn, desc)
+						vim.keymap.set("n", keys, fn, { buffer = event.buf, desc = desc })
+					end
 
-				-- Navigation — standard Neovim LSP conventions (no leader prefix)
-				map("gd", vim.lsp.buf.definition, "Go to definition")
-				map("gD", vim.lsp.buf.declaration, "Go to declaration")
-				map("gI", vim.lsp.buf.implementation, "Go to implementation")
-				map("K", vim.lsp.buf.hover, "Hover documentation")
-				map("gr", vim.lsp.buf.references, "Find references")
+					-- Navigation — standard Neovim LSP conventions (no leader prefix)
+					map("gd", vim.lsp.buf.definition, "Go to definition")
+					map("gD", vim.lsp.buf.declaration, "Go to declaration")
+					map("gI", vim.lsp.buf.implementation, "Go to implementation")
+					map("K", vim.lsp.buf.hover, "Hover documentation")
+					map("gr", vim.lsp.buf.references, "Find references")
 
-				-- <leader>l group — LSP operations (group label set in editor.lua which-key)
-				map("<leader>lr", vim.lsp.buf.rename, "Rename symbol")
-				map("<leader>la", vim.lsp.buf.code_action, "Code action")
-				map("<leader>ld", vim.diagnostic.open_float, "Show diagnostic float")
-				map("<leader>lf", function()
-					vim.lsp.buf.format({ async = true })
-				end, "Format buffer (LSP)")
-			end,
-		})
+					-- <leader>l group — LSP operations (group label set in editor.lua which-key)
+					map("<leader>lr", vim.lsp.buf.rename, "Rename symbol")
+					map("<leader>la", vim.lsp.buf.code_action, "Code action")
+					map("<leader>ld", vim.diagnostic.open_float, "Show diagnostic float")
+					map("<leader>lf", function()
+						vim.lsp.buf.format({ async = true })
+					end, "Format buffer (LSP)")
+				end,
+			})
 
 			-- ── D. Per-server config via vim.lsp.config() ───────────────────────
 			-- Only servers needing non-default config are listed here.
@@ -108,14 +110,14 @@ return {
 					end
 				end,
 				settings = {
-				python = {
-					analysis = {
-						typeCheckingMode = "strict",
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
+					python = {
+						analysis = {
+							typeCheckingMode = "strict",
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+						},
 					},
 				},
-			},
 			})
 
 			-- ── bashls — Bash/sh/zsh completions and hover ───────────────────────
