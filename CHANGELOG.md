@@ -1,3 +1,9 @@
+## v0.4.1 (2026-04-06)
+
+### Fix
+
+- **keymaps**: replace deprecated diagnostic navigation with vim.diagnostic.jump()
+
 ## v0.4.0 (2026-04-06)
 
 ### Feat
