@@ -66,19 +66,9 @@ return {
 			},
 		},
 	},
-
-	-- ── Auto-close brackets and quotes: nvim-autopairs ──────────────────────
-	-- Pairs are inserted on the character that opens them, so InsertEnter is fine.
-	-- Loads only when the user enters insert mode — saves startup time.
-	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		opts = {},
-	},
 	{
 		"folke/flash.nvim",
 		event = "VeryLazy",
-		---@type Flash.Config
 		opts = {
 			modes = {
 				-- Enhanced f, t, F, T motions
@@ -90,7 +80,7 @@ return {
 		},
 		keys = {
 			{
-				"s",
+				"m",
 				mode = { "n", "x", "o" },
 				function()
 					require("flash").jump()
@@ -98,7 +88,7 @@ return {
 				desc = "Flash",
 			},
 			{
-				"S",
+				"M",
 				mode = { "n", "x", "o" },
 				function()
 					require("flash").treesitter()
@@ -133,17 +123,25 @@ return {
 	},
 	{
 		"Wansmer/treesj",
-		keys = { "<space>m", "<space>j", "<space>s" },
+		keys = { "<space>m", "<space>j", "<space>k" },
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		config = function()
 			require("treesj").setup({})
 		end,
 	},
 	{
-		"nvim-mini/mini.nvim",
-		version = "*",
+		"nvim-mini/mini.surround",
+		version = false,
+		keys = {
+			{ "sa", mode = { "n", "x" }, desc = "Add Surrounding" },
+			{ "sd", mode = "n", desc = "Delete Surrounding" },
+			{ "sr", mode = "n", desc = "Replace Surrounding" },
+			{ "sf", mode = "n", desc = "Find Surrounding" },
+			{ "sF", mode = "n", desc = "Find Left Surrounding" },
+			{ "sh", mode = "n", desc = "Highlight Surrounding" },
+		},
 		config = function()
-			require("mini.pairs").setup()
+			require("mini.surround").setup({})
 		end,
 	},
 }

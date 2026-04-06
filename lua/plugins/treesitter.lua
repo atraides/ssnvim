@@ -25,6 +25,7 @@ return {
 				"lua",
 				"markdown",
 				"markdown_inline",
+				"regex",
 				"dockerfile",
 				"gh_actions_expressions", -- injected grammar for ${{ }} expression highlighting
 			})

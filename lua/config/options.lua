@@ -63,4 +63,4 @@ vim.opt.foldmethod = "expr" -- treesitter-expression folding
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- native Neovim 0.10+ fold expr
 vim.opt.foldenable = false -- folds open by default
 
-vim.diagnostic.config({ jump = { float = true } })
+vim.diagnostic.config({ on_jump = { float = true } })
