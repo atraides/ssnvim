@@ -35,7 +35,7 @@ vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
 
 -- ── Paste / delete without clobbering register ────────────────────────────
 vim.keymap.set("x", "<leader>p", '"_dP', { desc = "Paste without yanking selection" })
-vim.keymap.set({ "n", "v" }, "<leader>d", '"_d', { desc = "Delete without yanking" })
+vim.keymap.set({ "n", "v" }, "<leader>dd", '"_d', { desc = "Delete without yanking" })
 
 -- ── Quickfix navigation ───────────────────────────────────────────────────
 vim.keymap.set("n", "[q", "<cmd>cprevious<cr>", { desc = "Previous quickfix item" })

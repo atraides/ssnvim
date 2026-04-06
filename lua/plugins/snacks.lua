@@ -462,7 +462,7 @@ return {
 				desc = "Goto Declaration",
 			},
 			{
-				"gr",
+				"grf",
 				function()
 					Snacks.picker.lsp_references()
 				end,
