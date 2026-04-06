@@ -84,11 +84,41 @@ Leader key is `<Space>`. Press `<leader>` and pause to see all bindings via whic
 | `<leader>ff` | Find files |
 | `<leader><space>` | Smart find files |
 | `<leader>/` | Live grep |
+| `<leader>:` | Command history |
 | `<leader>fb` | Open buffers |
 | `<leader>fr` | Recent files |
 | `<leader>fp` | Projects |
 | `<leader>e` | File explorer (snacks) |
 | `-` | Open parent directory (oil.nvim) |
+
+### Search (`<leader>s`)
+
+| Key | Action |
+|---|---|
+| `<leader>sg` | Grep |
+| `<leader>sw` | Grep word under cursor / visual selection |
+| `<leader>sb` | Buffer lines |
+| `<leader>sB` | Grep open buffers |
+| `<leader>sd` | Project diagnostics |
+| `<leader>sD` | Buffer diagnostics |
+| `<leader>ss` | LSP document symbols |
+| `<leader>sS` | LSP workspace symbols |
+| `<leader>sk` | Keymaps |
+| `<leader>sm` | Marks |
+| `<leader>sj` | Jump list |
+| `<leader>su` | Undo history |
+| `<leader>sq` | Quickfix list |
+| `<leader>sR` | Resume last picker |
+| `<leader>sc` | Command history |
+| `<leader>sC` | Commands |
+| `<leader>sa` | Autocmds |
+| `<leader>sH` | Highlights |
+| `<leader>si` | Icons |
+| `<leader>sl` | Location list |
+| `<leader>sM` | Man pages |
+| `<leader>sp` | Plugin specs (lazy) |
+| `<leader>s"` | Registers |
+| `<leader>s/` | Search history |
 
 ### Git
 
@@ -99,32 +129,48 @@ Leader key is `<Space>`. Press `<leader>` and pause to see all bindings via whic
 | `<leader>gv` | Diff: repo history |
 | `<leader>gV` | Diff: current file history |
 | `<leader>gc` | Diff: compare revisions (prompts) |
+| `<leader>gC` | Diff: file history with range |
+| `<leader>g2` | Diff: compare two arbitrary files |
 | `<leader>gB` | Open file on GitHub in browser |
 | `<leader>gi` / `<leader>gI` | GitHub Issues (open / all) |
 | `<leader>gp` / `<leader>gP` | GitHub Pull Requests (open / all) |
 | `]h` / `[h` | Next / previous hunk |
+| `]H` / `[H` | Last / first hunk |
 | `<leader>ghs` | Stage hunk |
 | `<leader>ghr` | Reset hunk |
-| `<leader>ghb` | Blame line |
+| `<leader>ghS` | Stage buffer |
+| `<leader>ghR` | Reset buffer |
+| `<leader>ghu` | Undo stage hunk |
+| `<leader>ghp` | Preview hunk inline |
+| `<leader>ghb` | Blame line (full) |
+| `<leader>ghB` | Blame buffer |
+| `<leader>ghd` | Diff this |
+| `ih` | Select hunk (text object, operator/visual) |
 
 ### LSP (active in buffers with LSP attached)
 
 | Key | Action |
 |---|---|
-| `gd` | Go to definition |
-| `gD` | Go to declaration |
-| `gI` | Go to implementation |
-| `gr` | References |
+| `gd` | Go to definition (snacks picker) |
+| `gD` | Go to declaration (snacks picker) |
+| `gI` | Go to implementation (snacks picker) |
+| `grf` | References (snacks picker) |
+| `gy` | Go to type definition (snacks picker) |
 | `K` | Hover docs |
+| `gr` | References (quickfix, buffer-local) |
 | `<leader>lr` | Rename symbol |
 | `<leader>la` | Code actions |
+| `<leader>ld` | Show diagnostic float |
 | `<leader>lf` | Format buffer (LSP) |
+| `[d` / `]d` | Previous / next diagnostic |
 
 ### Formatting
 
 | Key | Action |
 |---|---|
 | `<leader>cf` | Format buffer (conform) |
+| `<leader>cF` | Format injected languages |
+| `<leader>cn` | ConformInfo |
 | `<leader>uf` | Toggle autoformat on/off |
 
 ### Motion (flash.nvim)
@@ -133,26 +179,94 @@ Leader key is `<Space>`. Press `<leader>` and pause to see all bindings via whic
 |---|---|
 | `m` | Flash jump (any visible location) |
 | `M` | Flash treesitter (select by syntax node) |
+| `r` | Remote flash (operator mode) |
+| `R` | Treesitter search (operator/visual) |
+| `<C-s>` | Toggle flash search (command mode) |
+
+### Treesitter Text Objects & Motions
+
+| Key | Mode | Action |
+|---|---|---|
+| `af` / `if` | x, o | Outer / inner function |
+| `ac` / `ic` | x, o | Outer / inner class |
+| `aa` / `ia` | x, o | Outer / inner parameter |
+| `ad` | x, o | Comment |
+| `as` | x, o | Statement |
+| `]m` / `[m` | n, x, o | Next / prev function start |
+| `]M` / `[M` | n, x, o | Next / prev function end |
+| `]]` / `[[` | n, x, o | Next / prev class start |
+| `]o` / `[o` | n, x, o | Next / prev loop |
 
 ### Editing
 
 | Key | Action |
 |---|---|
 | `<space>m` | Toggle split/join block (treesj) |
+| `<space>j` | Join block |
+| `<space>k` | Split block |
 | `sa` / `sd` / `sr` | Add / delete / replace surrounding |
+| `sf` / `sF` | Find surrounding (right / left) |
+| `sh` | Highlight surrounding |
 | `<C-d>` / `<C-u>` | Scroll down / up (cursor stays centred) |
 | `J` / `K` (visual) | Move selection down / up |
+| `<` / `>` (visual) | Indent left / right (stays in visual) |
 | `<leader>p` (visual) | Paste without clobbering register |
 | `<leader>dd` | Delete without yanking |
+| `<leader>cR` | Rename file |
 
-### Terminal & Misc
+### Buffer Management
 
 | Key | Action |
 |---|---|
-| `<leader>ft` / `<C-/>` | Open floating terminal |
+| `<leader>bd` | Delete buffer |
+| `<leader>bo` | Delete other buffers |
+| `[b` / `]b` | Previous / next buffer |
+| `[q` / `]q` | Previous / next quickfix item |
+
+### UI Toggles (`<leader>u`)
+
+| Key | Action |
+|---|---|
+| `<leader>us` | Toggle spelling |
+| `<leader>uw` | Toggle line wrap |
+| `<leader>ul` | Toggle line numbers |
+| `<leader>uL` | Toggle relative numbers |
+| `<leader>ud` | Toggle diagnostics |
+| `<leader>uf` | Toggle autoformat |
+| `<leader>uT` | Toggle treesitter |
+| `<leader>ub` | Toggle dark/light background |
+| `<leader>uC` | Browse colorschemes |
+| `<leader>uc` | Toggle conceal level |
+| `<leader>uA` | Toggle tabline |
+| `<leader>uD` | Toggle dim |
+| `<leader>ua` | Toggle animations |
+| `<leader>ug` | Toggle indent guides |
+| `<leader>uS` | Toggle smooth scroll |
+| `<leader>uZ` | Toggle zoom |
+| `<leader>uz` | Toggle zen |
+| `<leader>wm` | Toggle window zoom |
+
+### Terminal & Notifications
+
+| Key | Action |
+|---|---|
+| `<leader>ft` | Open floating terminal (root dir) |
+| `<leader>fT` | Open floating terminal (cwd) |
+| `<C-/>` | Toggle terminal |
 | `<leader>z` / `<leader>Z` | Zen mode / zoom |
 | `<leader>.` | Toggle scratch buffer |
+| `<leader>S` | Select scratch buffer |
+| `<leader>n` | Notification history |
+| `<leader>un` | Dismiss all notifications |
 | `<Esc>` | Clear search highlight |
+
+### Window Navigation
+
+| Key | Action |
+|---|---|
+| `<C-h/j/k/l>` | Move to left/down/up/right window |
+| `<C-Up/Down>` | Increase / decrease window height |
+| `<C-Left/Right>` | Decrease / increase window width |
 
 ---
 

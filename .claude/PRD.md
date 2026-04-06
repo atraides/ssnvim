@@ -1,8 +1,8 @@
 # ssnvim — Product Requirements Document
 
-> **Version:** 2.0
+> **Version:** 2.1
 > **Date:** 2026-04-06
-> **Status:** Approved — All phases complete; reflects actual codebase state as of v0.3.1
+> **Status:** Approved — All phases complete; reflects actual codebase state as of v0.4.0
 
 ---
 
@@ -307,24 +307,38 @@ snacks.nvim is configured as the primary multi-tool, replacing what would otherw
 | `picker.files`           | `<leader><space>`    | Smart find files                         |
 | `picker.grep`            | `<leader>/`          | Live grep across project                 |
 | `picker.grep`            | `<leader>sg`         | Grep                                     |
+| `picker.grep_word`       | `<leader>sw`         | Grep word / visual selection             |
 | `picker.buffers`         | `<leader>fb`         | Switch open buffers                      |
 | `picker.recent`          | `<leader>fr`         | Recent files                             |
 | `picker.projects`        | `<leader>fp`         | Projects                                 |
 | `picker.lsp_symbols`     | `<leader>ss`         | LSP document symbols                     |
+| `picker.lsp_workspace_symbols` | `<leader>sS`   | LSP workspace symbols                    |
 | `picker.diagnostics`     | `<leader>sd`         | Project diagnostics                      |
+| `picker.diagnostics_buffer` | `<leader>sD`      | Buffer diagnostics                       |
 | `picker.command_history` | `<leader>:`          | Command history                          |
+| `picker.lsp_definitions` | `gd`                 | Go to definition (picker)                |
+| `picker.lsp_declarations`| `gD`                 | Go to declaration (picker)               |
+| `picker.lsp_references`  | `grf`                | References (picker)                      |
+| `picker.lsp_implementations` | `gI`             | Go to implementation (picker)            |
+| `picker.lsp_type_definitions` | `gy`            | Go to type definition (picker)           |
 | `lazygit`                | `<leader>gg`         | Open lazygit float                       |
 | `terminal`               | `<leader>ft`/`<c-/>` | Open floating terminal                   |
+| `terminal` (cwd)         | `<leader>fT`         | Open terminal in cwd                     |
 | `dashboard`              | (startup)            | Dashboard on `nvim` with no args         |
 | `notifier`               | (automatic)          | Replaces vim.notify                      |
+| `notifier.show_history`  | `<leader>n`          | Notification history                     |
+| `notifier.hide`          | `<leader>un`         | Dismiss all notifications                |
 | `indent`                 | (automatic)          | Indent guides on all buffers             |
 | `explorer`               | `<leader>e`          | File explorer (snacks-based)             |
 | `gh.issues`              | `<leader>gi/gI`      | GitHub Issues (open / all)               |
 | `gh.prs`                 | `<leader>gp/gP`      | GitHub Pull Requests (open / all)        |
+| `gitbrowse`              | `<leader>gB`         | Open file/selection on GitHub in browser |
 | `zen`                    | `<leader>z/Z`        | Zen mode / zoom                          |
 | `scratch`                | `<leader>.`          | Toggle scratch buffer                    |
-| `words`                  | `]]` / `[[`          | Next/Prev word reference (n, t modes)    |
-| `gitbrowse`              | `<leader>gB`         | Open file/selection on GitHub in browser |
+| `scratch.select`         | `<leader>S`          | Select scratch buffer                    |
+| `rename.rename_file`     | `<leader>cR`         | Rename file                              |
+| `bufdelete`              | `<leader>bd`         | Delete buffer                            |
+| `bufdelete.other`        | `<leader>bo`         | Delete other buffers                     |
 
 ### 7.2 LSP Configuration
 
@@ -372,9 +386,10 @@ Each language server is configured with explicit settings, not defaults.
 | `gr`         | `vim.lsp.buf.references`     |
 | `<leader>lr` | `vim.lsp.buf.rename`         |
 | `<leader>la` | `vim.lsp.buf.code_action`    |
+| `<leader>ld` | `vim.diagnostic.open_float`  |
 | `<leader>lf` | `vim.lsp.buf.format` (async) |
 
-> **Note:** `gd`, `gD`, `gI` are also defined in `snacks.lua` as picker-based navigation. The snacks keys are global; the LspAttach versions are buffer-local. In LSP buffers, the buffer-local bindings take precedence.
+> **Note:** `gd`, `gD`, `gI` are also defined in `snacks.lua` as picker-based navigation (`grf` for references, `gy` for type definitions). The snacks keys are global; the LspAttach versions are buffer-local. In LSP buffers, the buffer-local bindings take precedence for `gd`/`gD`/`gI`. `grf` and `gy` are snacks-only (no LspAttach equivalent).
 
 ### 7.3 Completion Stack
 
@@ -416,7 +431,6 @@ Format-on-save enabled for all configured filetypes. Auto-format is skipped for 
 | `<leader>cF` | n, v | Format injected languages (3000ms) |
 | `<leader>cn` | n, v | `:ConformInfo`                     |
 | `<leader>uf` | n    | Toggle autoformat (global)         |
-
 ### 7.5 Linting (nvim-lint)
 
 Async linting triggered on `BufWritePost` and `BufReadPost`. Python is intentionally excluded — the `ruff` LSP server handles diagnostics directly without needing a separate linter process.
@@ -450,6 +464,8 @@ Two plugins handle git functionality, each with a distinct role:
 - Uses `dlyongemallo/diffview.nvim` fork (HACK: upstream `sindrets/diffview.nvim` is unmaintained)
 - `enhanced_diff_hl = true`, `watch_index = true`
 - Opened via `<leader>gd` (git status diff), `<leader>gv` (repo history), `<leader>gV` (current file history)
+- `<leader>gc` — compare revisions (prompts for ref); `<leader>gC` — file history with range
+- `<leader>g2` — compare two arbitrary files side by side
 - Merge conflict resolution: `<leader>co/ct/cb/cx` for ours/theirs/both/delete
 
 ### 7.7 Enhanced Editing
@@ -817,7 +833,7 @@ The MVP is complete when:
 | **diffview.nvim fork divergence** — `dlyongemallo` fork may fall behind or introduce bugs vs. upstream                                                  | Medium     | Low    | Monitor upstream `sindrets/diffview.nvim` for revival; switch back when it becomes maintained again; fork is a drop-in replacement today                                      |
 | **gh_actions_expressions parser not installed** — `gh-actions.nvim` silently does nothing if the custom treesitter parser is missing                    | Low        | Low    | `require("gh-actions.tree-sitter").setup()` must be called before `nvim-treesitter` installs parsers; ordering is enforced by the `dependencies` field in `treesitter.lua`    |
 | **gh_actions_ls textEdit crash** — server sends positions exceeding buffer line count, crashing `vim/lsp/sync.lua`                                      | Low        | Medium | `flags = { allow_incremental_sync = false }` forces full-document sync; overhead is negligible on short workflow files; document this as a known workaround                   |
-| **`[[`/`]]` keymap conflict** — both treesitter-textobjects (class navigation) and snacks.words (word reference) register these keys                    | Low        | Low    | Last registration wins; snacks.words registers later and takes effect; treesitter class navigation available via other motions or reconfigured keys if needed                 |
+| **`[[`/`]]` keymap conflict** — both treesitter-textobjects (class navigation) and snacks.words (word reference) register these keys | Low | Low | treesitter-textobjects registers last and takes precedence; snacks.words `]]`/`[[` bindings are intentionally omitted from `snacks.lua` — see note in that file. Class navigation is the authoritative binding. |
 
 ---
 

@@ -18,21 +18,30 @@ Full requirements and decisions are in `.claude/PRD.md`.
 |---|---|
 | Neovim 0.11+ | The editor; Lua 5.1 (LuaJIT) as the config language |
 | `lazy.nvim` | Plugin manager; lazy-loading; lockfile (`lazy-lock.json`) |
-| `snacks.nvim` | Picker, dashboard, lazygit float, terminal float, indent guides, notifier |
-| `blink.cmp` | Completion engine (replaces nvim-cmp) |
+| `snacks.nvim` | Multi-tool hub: picker, dashboard, lazygit, terminal, gh, explorer, indent, notifier, zen, scratch |
+| `blink.cmp` | Completion engine (replaces nvim-cmp; pre-built Rust binary) |
 | `copilot.lua` + `blink-copilot` | GitHub Copilot (enterprise subscription) |
 | `nvim-lspconfig` + `mason.nvim` | LSP client config + automated server installation |
+| `mason-lspconfig.nvim` | Mason ↔ lspconfig bridge (automatic_enable) |
 | `conform.nvim` | Format-on-save runner |
 | `nvim-lint` | Async linting |
-| `nvim-treesitter` | Syntax highlighting and text objects |
-| `rose-pine/neovim` | Colorscheme (dawn=light, moon=dark) |
-| `auto-dark-mode.nvim` | Switches rose-pine variant with macOS appearance |
-| `lualine.nvim` | Statusline with K8s context component |
+| `nvim-treesitter` + `nvim-treesitter-textobjects` | Syntax highlighting, text objects, and motions |
+| `gh-actions.nvim` | GitHub Actions `${{ }}` expression treesitter grammar |
+| `atraides/neovim-ayu` | Colorscheme (ayu-mirage=dark, ayu-light=light) |
+| `auto-dark-mode.nvim` | Switches ayu variant with macOS appearance (polls every 1s) |
+| `lualine.nvim` | Statusline (mode, branch, filename, diff, diagnostics, LSP status) |
+| `noice.nvim` | Enhanced cmdline, message, and notification UI |
+| `todo-comments.nvim` | Highlight and search TODO/FIXME/NOTE/HACK/PERF comments |
+| `mini.icons` | File and other icons (replaces nvim-web-devicons as icon provider) |
 | `oil.nvim` | File manager (filesystem-as-buffer) |
-| `gitsigns.nvim` | In-buffer git decorations and hunk operations |
+| `gitsigns.nvim` | In-buffer git decorations, hunk operations, and blame |
+| `diffview.nvim` | Rich side-by-side diffs and file history (`dlyongemallo` fork) |
+| `flash.nvim` | Enhanced motion and search with jump labels |
+| `treesj` | Split/join code blocks (treesitter-aware) |
 | `which-key.nvim` | Keybinding discovery popup |
+| `mini.surround` | Surround text objects (sa/sd/sr/sf/sF/sh) |
+| `mini.pairs` | Auto-close brackets and quotes (replaces nvim-autopairs) |
 | `schemastore.nvim` | YAML schema catalog (K8s, Helm, ArgoCD CRDs) |
-| `nvim-autopairs` | Auto-close brackets and quotes |
 
 ---
 
@@ -43,14 +52,17 @@ ssnvim/
 ├── init.lua                    # Entry point: bootstrap lazy.nvim, require config modules
 ├── lua/
 │   ├── config/
+│   │   ├── init.lua            # Loads options, keymaps, autocmds
 │   │   ├── options.lua         # vim.opt.* — editor behaviour
 │   │   ├── keymaps.lua         # Non-plugin keymaps (window/buffer nav, utilities)
-│   │   └── autocmds.lua        # Autocommands (Helm ftdetect, whitespace trim, etc.)
+│   │   └── autocmds.lua        # Autocommands (Helm/GHA ftdetect, whitespace trim, etc.)
 │   └── plugins/
-│       ├── ui.lua              # rose-pine, auto-dark-mode, lualine
-│       ├── snacks.lua          # snacks.nvim: picker, dashboard, lazygit, terminal, indent, notifier
-│       ├── editor.lua          # oil.nvim, gitsigns, nvim-autopairs, which-key
-│       ├── treesitter.lua      # nvim-treesitter + parsers
+│       ├── init.lua            # Empty placeholder (returns {})
+│       ├── ui.lua              # neovim-ayu, auto-dark-mode, lualine, noice, todo-comments, mini.icons
+│       ├── snacks.lua          # snacks.nvim: picker, dashboard, lazygit, terminal, gh, explorer, etc.
+│       ├── editor.lua          # oil.nvim, which-key, flash, treesj, mini.surround, mini.pairs
+│       ├── git.lua             # gitsigns.nvim, diffview.nvim
+│       ├── treesitter.lua      # nvim-treesitter + textobjects + gh-actions.nvim
 │       ├── lsp.lua             # mason + mason-lspconfig + nvim-lspconfig + SchemaStore
 │       ├── completion.lua      # blink.cmp + copilot.lua + blink-copilot
 │       ├── formatting.lua      # conform.nvim
@@ -101,8 +113,9 @@ return {
 
 - Leader key: `<Space>`
 - All custom bindings registered through `which-key.nvim` with a `desc` string
-- Binding groups: `<leader>f` (find/pick), `<leader>g` (git), `<leader>l` (LSP), `<leader>t` (terminal), `<leader>c` (code actions)
+- Binding groups: `<leader>f` (find/pick), `<leader>g` (git), `<leader>l` (LSP), `<leader>t` (terminal — unused; terminal lives under `<leader>f`), `<leader>c` (code actions), `<leader>s` (search), `<leader>u` (UI toggles), `<leader>b` (buffer)
 - LSP bindings use `LspAttach` autocmd so they only exist in buffers with an active LSP client
+- `gd`, `gD`, `gI`, `grf`, `gy` are defined globally in `snacks.lua` as picker-based navigation; buffer-local LspAttach versions of `gd`/`gD`/`gI` are shadowed by the global snacks bindings in practice
 
 ---
 
@@ -156,6 +169,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 - **Helm vs YAML LSP conflict**: `yamlls` must have `filetypes` set to exclude `helm`; `helm-ls` must only attach to `ft=helm`
 - **K8s statusline component**: cache the `kubectl` context result; do not call `io.popen` on every statusline redraw
 - **Python venv**: always configure `pyright` with explicit `venvPath` settings; do not rely on PATH alone
+- **mini.nvim org**: plugin specs use `nvim-mini/mini.surround`, `nvim-mini/mini.pairs`, `nvim-mini/mini.icons` — do not change to `echasnovski/` without verifying lazy.nvim resolves the repo correctly
 
 ---
 
@@ -198,10 +212,11 @@ Inside Neovim after a fresh install:
 | `init.lua` | Entry point — touch only to add new top-level requires |
 | `lua/config/options.lua` | All `vim.opt.*` settings |
 | `lua/config/keymaps.lua` | Non-plugin global keymaps |
-| `lua/config/autocmds.lua` | Filetype detection (Helm), QoL autocmds |
+| `lua/config/autocmds.lua` | Filetype detection (Helm, GitHub Actions), QoL autocmds |
 | `lua/plugins/lsp.lua` | Most complex file — LSP server configs, SchemaStore, venv detection |
-| `lua/plugins/snacks.lua` | Central navigation hub — picker, lazygit, terminal |
+| `lua/plugins/snacks.lua` | Central navigation hub — picker, lazygit, terminal, gh, explorer |
 | `lua/plugins/completion.lua` | blink.cmp + Copilot wiring |
+| `lua/plugins/git.lua` | gitsigns (hunk ops, blame) + diffview (diff views, file history) |
 | `lazy-lock.json` | **Always commit** — pins plugin versions for reproducibility |
 | `.claude/PRD.md` | Full requirements, plugin list, build phases, risk register |
 
@@ -213,14 +228,15 @@ The config is built incrementally. Each phase is complete and functional before 
 
 | Phase | Files | Status |
 |---|---|---|
-| 1 — Foundation | `init.lua`, `config/options.lua`, `config/keymaps.lua`, `config/autocmds.lua` | 🔲 Not started |
-| 2 — Look & Feel | `plugins/ui.lua` (rose-pine, auto-dark-mode, lualine + K8s) | 🔲 Not started |
-| 3 — Navigation | `plugins/snacks.lua` (picker, lazygit, terminal), `plugins/editor.lua` (oil, gitsigns, which-key, autopairs) | 🔲 Not started |
-| 4 — Treesitter | `plugins/treesitter.lua` | 🔲 Not started |
-| 5 — LSP | `plugins/lsp.lua` | 🔲 Not started |
-| 6 — Completion | `plugins/completion.lua` | 🔲 Not started |
-| 7 — Format/Lint | `plugins/formatting.lua`, `plugins/linting.lua` | 🔲 Not started |
+| 1 — Foundation | `init.lua`, `config/options.lua`, `config/keymaps.lua`, `config/autocmds.lua` | ✅ Complete |
+| 2 — Look & Feel | `plugins/ui.lua` (neovim-ayu, auto-dark-mode, lualine, noice, todo-comments) | ✅ Complete |
+| 3 — Navigation | `plugins/snacks.lua` (picker, lazygit, terminal, gh, explorer), `plugins/editor.lua` (oil, which-key, flash, treesj, mini.surround, mini.pairs), `plugins/git.lua` (gitsigns, diffview) | ✅ Complete |
+| 4 — Treesitter | `plugins/treesitter.lua` (nvim-treesitter + textobjects + gh-actions.nvim) | ✅ Complete |
+| 5 — LSP | `plugins/lsp.lua` | ✅ Complete |
+| 6 — Completion | `plugins/completion.lua` | ✅ Complete |
+| 7 — Format/Lint | `plugins/formatting.lua`, `plugins/linting.lua` | ✅ Complete |
 | 8 — Polish | README, checkhealth, startup time, lockfile commit | ✅ Complete |
+| 9 — GitHub Actions | `yaml.github-actions` ft, `gh_actions_ls`, `actionlint`, `gh-actions.nvim` | ✅ Complete |
 
 ---
 
