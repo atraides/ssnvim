@@ -44,6 +44,29 @@ vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
 -- ── Diagnostic navigation ─────────────────────────────────────────────────
 -- Works without LSP (e.g. nvim-lint diagnostics). The LSP diagnostic float
 -- (<leader>ld) is registered buffer-locally in plugins/lsp.lua LspAttach.
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+-- Override Neovim's built-in [d/]d — they jump but don't open the float.
+-- vim.diagnostic.jump() is the non-deprecated replacement for goto_prev/goto_next.
+-- on_jump fires after the cursor has moved, so open_float() lands on the diagnostic.
+vim.keymap.set("n", "[d", function()
+	vim.diagnostic.jump({
+		count = -1,
+		on_jump = function(diagnostic, bufnr)
+			if not diagnostic then
+				return
+			end
+			vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+		end,
+	})
+end, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", function()
+	vim.diagnostic.jump({
+		count = 1,
+		on_jump = function(diagnostic, bufnr)
+			if not diagnostic then
+				return
+			end
+			vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+		end,
+	})
+end, { desc = "Next diagnostic" })
 -- NOTE: Diffview keymaps (<leader>g*) live in lua/plugins/git.lua init function.
