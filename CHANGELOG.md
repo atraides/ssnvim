@@ -1,3 +1,19 @@
+## v0.4.0 (2026-04-06)
+
+### Feat
+
+- **editor**: add mini.pairs for auto-close bracket pairs
+- **flash**: enable jump_labels for f/t/F/T char motions
+- **plugins**: add flash, treesj, mini.pairs; enable noice LSP overrides
+
+### Fix
+
+- **review**: resolve 14 pre-release issues across config files
+
+### Refactor
+
+- **plugins**: swap autopairs for mini.surround; fix keymap conflicts
+
 ## v0.3.1 (2026-04-05)
 
 ### Fix
