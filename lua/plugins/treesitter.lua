@@ -2,7 +2,11 @@
 
 return {
 
-	-- ── Treesitter: syntax highlighting + indent + incremental selection ────
+	-- ── Treesitter: syntax highlighting + textobjects ────────────────────────
+	-- nvim-treesitter-textobjects is an inline dependency so it loads together
+	-- with nvim-treesitter on the first BufReadPost/BufNewFile — no separate
+	-- lazy trigger needed, and no require() calls in an init hook (which would
+	-- defeat lazy loading by forcing the plugin to load at startup).
 	{
 		"nvim-treesitter/nvim-treesitter",
 		branch = "main",
@@ -10,9 +14,17 @@ return {
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
 			"Hdoc1509/gh-actions.nvim",
+			{
+				-- Must live here as a dependency so it loads together with nvim-treesitter.
+				"nvim-treesitter/nvim-treesitter-textobjects",
+				branch = "main",
+			},
 		},
 		config = function()
+			-- gh-actions must register its custom treesitter source BEFORE parsers
+			-- are installed. Order here is critical.
 			require("gh-actions.tree-sitter").setup()
+
 			require("nvim-treesitter").setup({})
 			require("nvim-treesitter").install({
 				"python",
@@ -29,14 +41,26 @@ return {
 				"dockerfile",
 				"gh_actions_expressions", -- injected grammar for ${{ }} expression highlighting
 			})
-		end,
-	},
-	{
-		"nvim-treesitter/nvim-treesitter-textobjects",
-		branch = "main",
-		init = function()
-			vim.g.no_plugin_maps = true
-			-- ── Select keymaps ───────────────────────────────────────────────
+
+			-- ── nvim-treesitter-textobjects setup ─────────────────────────────────
+			require("nvim-treesitter-textobjects").setup({
+				select = {
+					enable = true,
+					lookahead = true, -- jump to the next match if not currently inside one
+					selection_modes = {
+						["@parameter.outer"] = "v", -- charwise
+						["@function.outer"] = "V", -- linewise
+						["@class.outer"] = "<c-v>", -- blockwise
+					},
+					include_surrounding_whitespace = false,
+				},
+				move = {
+					enable = true,
+					set_jumps = true, -- add moves to the jumplist
+				},
+			})
+
+			-- ── Select keymaps ────────────────────────────────────────────────────
 			local sel = require("nvim-treesitter-textobjects.select")
 			for _, map in ipairs({
 				{ { "x", "o" }, "af", "@function.outer" },
@@ -53,7 +77,11 @@ return {
 				end, { desc = "Select " .. map[3] })
 			end
 
-			-- ── Move keymaps ─────────────────────────────────────────────────
+			-- ── Move keymaps ──────────────────────────────────────────────────────
+			-- NOTE: ]] / [[ are used here for class navigation. snacks.nvim also
+			-- binds ]] / [[ for word reference jumping, but those bindings are
+			-- intentionally omitted from snacks.lua — these textobjects bindings
+			-- are the authoritative definition. See plugins/snacks.lua for details.
 			local mv = require("nvim-treesitter-textobjects.move")
 			for _, map in ipairs({
 				{ { "n", "x", "o" }, "]m", mv.goto_next_start, "@function.outer" },
@@ -71,24 +99,6 @@ return {
 					fn(query, "textobjects")
 				end, { desc = "Move to " .. qstr })
 			end
-		end,
-		config = function()
-			require("nvim-treesitter-textobjects").setup({
-				select = {
-					enable = true,
-					lookahead = true,
-					selection_modes = {
-						["@parameter.outer"] = "v", -- charwise
-						["@function.outer"] = "V", -- linewise
-						["@class.outer"] = "<c-v>", -- blockwise
-					},
-					include_surrounding_whitespace = false,
-				},
-				move = {
-					enable = true,
-					set_jumps = true,
-				},
-			})
 		end,
 	},
 }

@@ -4,8 +4,8 @@ return {
 		-- Eager load: notifier must replace vim.notify before other plugins send notifications.
 		-- If lazy-loaded, early startup messages bypass snacks and are lost.
 		lazy = false,
-		priority = 950, -- below rose-pine (1000) so colorscheme is applied first
-		dependecies = {
+		priority = 1000, -- below neovim-ayu (1100) so colorscheme is applied first
+		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
 		---@type snacks.Config
@@ -232,20 +232,13 @@ return {
 				end,
 				desc = "Command History",
 			},
-			{
-				"<leader>n",
-				function()
-					Snacks.picker.notifications()
-				end,
-				desc = "Notification History",
-			},
-			{
-				"<leader>e",
-				function()
-					Snacks.explorer()
-				end,
-				desc = "File Explorer",
-			},
+		{
+			"<leader>e",
+			function()
+				Snacks.explorer()
+			end,
+			desc = "File Explorer",
+		},
 			-- find
 			{
 				"<leader>fb",
@@ -634,22 +627,9 @@ return {
 				end,
 				desc = "Dismiss All Notifications",
 			},
-			{
-				"]]",
-				function()
-					Snacks.words.jump(vim.v.count1)
-				end,
-				desc = "Next Reference",
-				mode = { "n", "t" },
-			},
-			{
-				"[[",
-				function()
-					Snacks.words.jump(-vim.v.count1)
-				end,
-				desc = "Prev Reference",
-				mode = { "n", "t" },
-			},
+		-- NOTE: ]] / [[ are intentionally NOT bound here. They are used for
+		-- treesitter-textobjects class navigation (registered in treesitter.lua config).
+		-- snacks.words is still active; use Snacks.words.jump() programmatically if needed.
 		},
 		init = function()
 			vim.api.nvim_create_autocmd("User", {

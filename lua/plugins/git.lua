@@ -75,7 +75,7 @@ return {
 		end,
 	},
 	{
-		-- HACK: Temporyaily use this as the original repo is unmaintained.
+		-- HACK: Temporarily use this fork as the original repo is unmaintained.
 		"dlyongemallo/diffview.nvim",
 		event = "BufReadPre",
 		init = function()

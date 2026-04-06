@@ -1,4 +1,5 @@
--- lua/plugins/editor.lua — oil.nvim, gitsigns, which-key, nvim-autopairs
+-- lua/plugins/editor.lua — oil.nvim, which-key, flash, treesj, mini.surround, mini.pairs
+-- Git plugins (gitsigns, diffview) live in lua/plugins/git.lua.
 
 return {
 
@@ -13,22 +14,6 @@ return {
 			"nvim-tree/nvim-web-devicons",
 		},
 		opts = {}, -- oil defaults are sufficient for MVP
-	},
-
-	-- ── Git decorations: gitsigns.nvim ──────────────────────────────────────
-	{
-		"lewis6991/gitsigns.nvim",
-		event = "BufReadPre",
-		opts = {
-			signs = {
-				add = { text = "▎" },
-				change = { text = "▎" },
-				delete = { text = "" },
-				topdelete = { text = "" },
-				changedelete = { text = "▎" },
-				untracked = { text = "▎" },
-			},
-		},
 	},
 
 	-- ── Keybinding discovery: which-key.nvim ────────────────────────────────
@@ -56,9 +41,10 @@ return {
 						return require("which-key.extras").expand.win()
 					end,
 				},
-				{ "<leader>f", group = "find" },
-				{ "<leader>g", group = "git" },
-				{ "<leader>t", group = "terminal" },
+			{ "<leader>f", group = "find" },
+			{ "<leader>g", group = "git" },
+			{ "<leader>s", group = "search" },
+			{ "<leader>t", group = "terminal" },
 				{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
 				{ "<leader>c", group = "code" },
 				{ "<leader>l", group = "lsp" },
@@ -142,6 +128,14 @@ return {
 		},
 		config = function()
 			require("mini.surround").setup({})
+		end,
+	},
+	{
+		"nvim-mini/mini.pairs",
+		version = false,
+		event = "InsertEnter",
+		config = function()
+			require("mini.pairs").setup({})
 		end,
 	},
 }

@@ -10,7 +10,7 @@ return {
 		"atraides/neovim-ayu",
 		name = "neovim-ayu", -- alias required; repo slug "neovim" collides with Neovim runtime
 		lazy = false,
-		priority = 1000,
+		priority = 1100,
 		opts = {
 			mirage = true,
 			terminal = true,
@@ -44,8 +44,8 @@ return {
 	},
 
 	-- ── Statusline: lualine ─────────────────────────────────────────────────
-	-- theme = "rose-pine" auto-matches the active colorscheme variant.
-	-- lualine_z right-side includes the cached K8s context component.
+	-- theme = "auto" delegates colour matching to lualine's auto-detection,
+	-- which picks up the active ayu variant at runtime.
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = false,
@@ -207,6 +207,27 @@ return {
 					inc_rename = false, -- enables an input dialog for inc-rename.nvim
 					lsp_doc_border = true, -- add a border to hover docs and signature help
 				},
+				routes = {
+					-- Pyright fires a $/progress cycle (begin → report → end) on every
+					-- keystroke that modifies a Python file (background type-analysis).
+					-- Confirmed via LspProgress debug logging: these spam events always
+					-- carry an empty title ("") and message "N file(s) to analyze".
+					-- Any *useful* pyright progress (e.g. initial workspace indexing)
+					-- arrives with a non-empty title and is therefore preserved.
+					{
+						filter = {
+							event = "lsp",
+							kind = "progress",
+							cond = function(message)
+								local client = vim.tbl_get(message.opts, "progress", "client")
+								local title = vim.tbl_get(message.opts, "progress", "title")
+								-- Drop only the untitled per-keystroke analysis spam from pyright.
+								return client == "pyright" and (title == nil or title == "")
+							end,
+						},
+						opts = { skip = true },
+					},
+				},
 			})
 		end,
 	},
@@ -216,6 +237,13 @@ return {
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			require("todo-comments").setup()
+		end,
+	},
+	{
+		"nvim-mini/mini.icons",
+		version = false,
+		config = function()
+			require("mini.icons").setup()
 		end,
 	},
 }
