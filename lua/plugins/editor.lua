@@ -56,13 +56,13 @@ return {
 						return require("which-key.extras").expand.win()
 					end,
 				},
-			{ "<leader>f", group = "find" },
-			{ "<leader>g", group = "git" },
-			{ "<leader>t", group = "terminal" },
-			{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
-			{ "<leader>c", group = "code" },
-			{ "<leader>l", group = "lsp" },
-			{ "z", group = "fold" },
+				{ "<leader>f", group = "find" },
+				{ "<leader>g", group = "git" },
+				{ "<leader>t", group = "terminal" },
+				{ "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+				{ "<leader>c", group = "code" },
+				{ "<leader>l", group = "lsp" },
+				{ "z", group = "fold" },
 			},
 		},
 	},
@@ -74,5 +74,68 @@ return {
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		opts = {},
+	},
+	{
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		---@type Flash.Config
+		opts = {},
+		keys = {
+			{
+				"s",
+				mode = { "n", "x", "o" },
+				function()
+					require("flash").jump()
+				end,
+				desc = "Flash",
+			},
+			{
+				"S",
+				mode = { "n", "x", "o" },
+				function()
+					require("flash").treesitter()
+				end,
+				desc = "Flash Treesitter",
+			},
+			{
+				"r",
+				mode = "o",
+				function()
+					require("flash").remote()
+				end,
+				desc = "Remote Flash",
+			},
+			{
+				"R",
+				mode = { "o", "x" },
+				function()
+					require("flash").treesitter_search()
+				end,
+				desc = "Treesitter Search",
+			},
+			{
+				"<c-s>",
+				mode = { "c" },
+				function()
+					require("flash").toggle()
+				end,
+				desc = "Toggle Flash Search",
+			},
+		},
+	},
+	{
+		"Wansmer/treesj",
+		keys = { "<space>m", "<space>j", "<space>s" },
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		config = function()
+			require("treesj").setup({})
+		end,
+	},
+	{
+		"nvim-mini/mini.nvim",
+		version = "*",
+		config = function()
+			require("mini.pairs").setup()
+		end,
 	},
 }
