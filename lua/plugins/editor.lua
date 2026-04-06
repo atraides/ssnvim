@@ -1,4 +1,4 @@
--- lua/plugins/editor.lua — oil.nvim, gitsigns, which-key, nvim-autopairs
+-- lua/plugins/editor.lua — oil.nvim, gitsigns, which-key, flash, treesj, mini.surround, mini.pairs
 
 return {
 
@@ -142,6 +142,14 @@ return {
 		},
 		config = function()
 			require("mini.surround").setup({})
+		end,
+	},
+	{
+		"nvim-mini/mini.pairs",
+		version = false,
+		event = "InsertEnter",
+		config = function()
+			require("mini.pairs").setup({})
 		end,
 	},
 }
