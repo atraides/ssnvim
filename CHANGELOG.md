@@ -1,3 +1,9 @@
+## v0.4.2 (2026-09-25)
+
+### Fix
+
+- **nvim**: Revert lockfile changes
+
 ## v0.4.1 (2026-04-06)
 
 ### Fix
