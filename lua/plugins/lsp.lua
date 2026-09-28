@@ -97,17 +97,77 @@ return {
 
 			-- ── pyright — Python type checking + completions ─────────────────────
 			vim.lsp.config("pyright", {
-				before_init = function(_, config)
-					local cwd = vim.fn.getcwd()
-					for _, candidate in ipairs({ "/.venv/bin/python", "/venv/bin/python" }) do
-						local path = cwd .. candidate
-						if vim.fn.executable(path) == 1 then
-							config.settings = config.settings or {}
-							config.settings.python = config.settings.python or {}
-							config.settings.python.pythonPath = path
-							return
+				on_init = function(client)
+					local root = client.config.root_dir or vim.fn.getcwd()
+					local candidates = {
+						root .. "/.venv/bin/python",
+						root .. "/venv/bin/python",
+					}
+
+					-- pyenv does not normally create a project-local .venv. Ask it for
+					-- the interpreter selected by .python-version instead of passing the
+					-- pyenv shim to Pyright.
+					if vim.fn.executable("pyenv") == 1 then
+						local pyenv_python = vim.fn.system({ "pyenv", "which", "python" })
+						if vim.v.shell_error == 0 then
+							table.insert(candidates, vim.trim(pyenv_python))
 						end
 					end
+
+					-- uv's default project environment is .venv; the fallbacks below
+					-- also make system/activated virtualenvs work as expected.
+					table.insert(candidates, vim.fn.exepath("python3"))
+					table.insert(candidates, vim.fn.exepath("python"))
+
+					local interpreter
+					for _, path in ipairs(candidates) do
+						if path ~= "" and vim.fn.executable(path) == 1 then
+							interpreter = path
+							break
+						end
+					end
+
+					if not interpreter then
+						return
+					end
+
+					local settings = client.config.settings or {}
+					settings.python = settings.python or {}
+					settings.python.analysis = settings.python.analysis or {}
+					settings.python.analysis.typeCheckingMode = "strict"
+					settings.python.pythonPath = interpreter
+
+					-- Pyright's LSP process cannot always infer site-packages from a
+					-- pyenv interpreter. Add them explicitly so imports such as
+					-- ansible.module_utils.basic resolve in the editor as well as in
+					-- the command line.
+					local site_packages = vim.fn.systemlist({
+						interpreter,
+						"-c",
+						"import site; print('\\n'.join(site.getsitepackages()))",
+					})
+					if vim.v.shell_error == 0 and #site_packages > 0 then
+						settings.python.analysis.extraPaths = site_packages
+					end
+
+					-- A project config takes precedence over ssnvim's strict default.
+					-- This is useful for Ansible collections, whose runtime API is
+					-- intentionally dynamic and generally has no type stubs.
+					local config_path = root .. "/pyrightconfig.json"
+					if vim.fn.filereadable(config_path) == 1 then
+						local lines = vim.fn.readfile(config_path)
+						local ok, project_config = pcall(vim.json.decode, table.concat(lines, "\n"))
+						if ok and project_config.typeCheckingMode then
+							settings.python.analysis.typeCheckingMode = project_config.typeCheckingMode
+						end
+					end
+
+					-- client.settings is what Neovim returns for Pyright's
+					-- workspace/configuration requests. Update both tables and notify
+					-- the server so it re-indexes with the selected interpreter.
+					client.config.settings = settings
+					client.settings = settings
+					client:notify("workspace/didChangeConfiguration", { settings = nil })
 				end,
 				settings = {
 					python = {
