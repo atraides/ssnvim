@@ -1,3 +1,9 @@
+## v0.5.0 (2026-09-28)
+
+### Feat
+
+- **python**: Add support for pyenv and local pyright config
+
 ## v0.4.2 (2026-09-25)
 
 ### Fix
