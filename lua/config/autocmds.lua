@@ -1,8 +1,26 @@
 -- lua/config/autocmds.lua — autocommands for filetype detection and QoL
 
--- ── Helm filetype detection ───────────────────────────────────────────────
+-- ── YAML dialect filetype detection ────────────────────────────────────────
 vim.filetype.add({
 	pattern = {
+		-- Ansible uses YAML, so only files in conventional Ansible directories
+		-- are given a distinct filetype. Plain YAML remains `yaml`.
+		[".*/defaults/.*%.ya?ml"] = "yaml.ansible",
+		[".*/host_vars/.*%.ya?ml"] = "yaml.ansible",
+		[".*/group_vars/.*%.ya?ml"] = "yaml.ansible",
+		[".*/group_vars/.*/.*%.ya?ml"] = "yaml.ansible",
+		[".*/playbook.*%.ya?ml"] = "yaml.ansible",
+		[".*/playbooks/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/tasks/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/handlers/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/defaults/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/vars/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/meta/.*%.ya?ml"] = "yaml.ansible",
+		[".*/tasks/.*%.ya?ml"] = "yaml.ansible",
+		[".*/handlers/.*%.ya?ml"] = "yaml.ansible",
+		[".*/molecule/.*%.ya?ml"] = "yaml.ansible",
+
+		-- Helm patterns are kept separate from regular YAML and Ansible YAML.
 		[".*/templates/.*%.yaml"] = "helm",
 		[".*/templates/.*%.yml"] = "helm",
 		[".*/templates/.*%.tpl"] = "helm",

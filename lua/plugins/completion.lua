@@ -13,6 +13,12 @@ return {
 		cmd = "Copilot", -- allow :Copilot auth / :Copilot status from normal mode
 		event = "InsertEnter", -- attach LSP client on first insert (not needed at startup)
 		opts = {
+			-- copilot.lua disables YAML by default. Ansible is YAML too, but the
+			-- dedicated filetype lets us enable it without enabling plain YAML.
+			filetypes = {
+				yaml = false,
+				["yaml.ansible"] = true,
+			},
 			suggestion = { enabled = false }, -- disable inline ghost text — blink handles this
 			panel = { enabled = false }, -- disable copilot panel
 		},
