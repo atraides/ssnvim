@@ -289,6 +289,7 @@ No manual toggle needed.
 | Go | `gopls` | `goimports` → `gofmt` | `golangci-lint` |
 | bash/zsh | `bash-language-server` | `shfmt` | `shellcheck` |
 | YAML / K8s | `yaml-language-server` + SchemaStore | — | `yamllint` |
+| Ansible YAML | `yaml-language-server` + Blink/Copilot | — | `yamllint` |
 | Helm | `helm-ls` | — | — |
 | GitHub Actions | `gh-actions-language-server` | — | `actionlint` |
 | Lua | `lua-language-server` | `stylua` | — |
@@ -296,8 +297,9 @@ No manual toggle needed.
 
 Python virtual environments are auto-detected from `.venv/`, `venv/`, `pyenv`, `poetry`, and `uv`.
 
-Helm templates (`templates/*.yaml`) and GitHub Actions workflows (`.github/workflows/*.yml`) each
-get their own filetype and LSP — they never conflict with `yamlls`.
+Helm templates (`templates/*.yaml`), Ansible files in conventional role/playbook directories, and
+GitHub Actions workflows (`.github/workflows/*.yml`) each get their own filetype. Plain YAML stays
+`yaml`; Copilot is enabled only for the Ansible filetype.
 
 ---
 

@@ -97,6 +97,7 @@ return {
 
 			-- ── pyright — Python type checking + completions ─────────────────────
 			vim.lsp.config("pyright", {
+				--- TODO: Review AI changes to make sure they are the best way to tackle this.
 				on_init = function(client)
 					local root = client.config.root_dir or vim.fn.getcwd()
 					local candidates = {
@@ -192,7 +193,7 @@ return {
 			-- this runs before BufRead autocmds and before LSP attach. If "helm" were
 			-- listed here, yamlls would attach to Helm buffers and conflict with helm_ls.
 			vim.lsp.config("yamlls", {
-				filetypes = { "yaml", "yaml.docker-compose" },
+				filetypes = { "yaml", "yaml.docker-compose", "yaml.ansible" },
 				settings = {
 					yaml = {
 						-- Disable built-in schema store; use schemastore.nvim catalog instead.
