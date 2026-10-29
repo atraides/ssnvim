@@ -1,3 +1,9 @@
+## v0.6.0 (2026-10-29)
+
+### Feat
+
+- **ansible**: Enable copilot for Ansible files
+
 ## v0.5.0 (2026-09-28)
 
 ### Feat
